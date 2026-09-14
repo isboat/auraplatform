@@ -36,6 +36,8 @@ Large files use multipart uploads so that file parts can be uploaded independent
 
 Every upload is submitted for review by platform administrators. While an upload is awaiting review, users can still find it through search, but the media is covered by an **In review** status message.
 
+After an upload completes successfully, the platform shows the uploader a confirmation message: **Your media is under review.**
+
 ## Account Registration and Verification
 
 Users can create an account by completing a registration form with:
