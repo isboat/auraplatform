@@ -86,6 +86,12 @@ The platform keeps track of the number of views for each video, image, and audio
 
 This layout gives users a familiar, YouTube-style overview of the content's engagement.
 
+## Comments Loading
+
+To improve content-page load performance, the comments section is hidden initially and comments are not requested with the initial page data. The user can select **Show comments** to reveal the section and load the first batch.
+
+Comments are retrieved in batches rather than all at once. Additional batches load incrementally as the user continues through the comments, reducing the initial data transfer and rendering work for media with long discussions.
+
 ## Advertising
 
 Aura Platform displays advertisements as part of its media hosting experience. Ads appear on the platform alongside hosted media and its related features.
