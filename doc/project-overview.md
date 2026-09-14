@@ -46,6 +46,15 @@ Users can create an account by completing a registration form with:
 
 After registration, the platform sends a verification email containing a link to the email verification page. The user follows the link to verify their email address, and successful verification completes the account setup.
 
+## Administrative Configuration
+
+Administrators can independently turn off:
+
+- The signup and registration page
+- The media upload page
+
+These feature settings are stored in MongoDB configuration collections. The platform reads the current settings and adapts the experience accordingly: disabled pages and their related navigation or actions are not rendered, while the backend also enforces each setting so users cannot bypass it by calling an API directly.
+
 ## User Access
 
 ### Anonymous Users
