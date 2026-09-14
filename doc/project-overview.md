@@ -35,8 +35,18 @@ Anonymous users can access hosted media without signing in. They can view images
 Signed-in users have the same access to hosted media as anonymous users. They can also engage with media by:
 
 - Leaving comments in a media item's comments section
-- Liking media
+- Liking or disliking media
 - Sharing media
+
+## Views and Engagement
+
+The platform keeps track of the number of views for each video, image, and audio item. An engagement summary displayed below the content shows:
+
+- Number of likes with a thumbs-up icon
+- Number of dislikes with a thumbs-down icon
+- Number of views
+
+This layout gives users a familiar, YouTube-style overview of the content's engagement.
 
 ## Advertising
 
