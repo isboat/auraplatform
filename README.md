@@ -30,6 +30,17 @@ dotnet run
 
 The API runs at `http://localhost:5080` under the included development launch profile. Replace the development JWT key before deployment and provide AWS credentials through the standard AWS credential chain.
 
+### Backend architecture
+
+The API follows a controller → service → repository structure:
+
+- Controllers own HTTP routing, authorization declarations, and response codes.
+- Services contain application rules and depend on interfaces for persistence and infrastructure.
+- Repositories isolate MongoDB queries and updates from application logic.
+- Infrastructure adapters isolate JWT creation, password hashing, email delivery, time, and S3 storage.
+
+Dependencies are registered in `Program.cs`, which serves only as the application composition root and middleware pipeline.
+
 ## Verification
 
 ```bash
@@ -37,4 +48,10 @@ cd frontend
 npm run lint
 npm run build
 npm run test:e2e
+```
+
+Backend unit tests enforce a minimum of 90% line coverage for the application service layer:
+
+```bash
+dotnet test AuraPlatform.slnx
 ```

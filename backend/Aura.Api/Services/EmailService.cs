@@ -1,4 +1,5 @@
 namespace Aura.Api.Services;
+
 public interface IEmailService { Task SendVerificationAsync(string email, string verificationUrl); }
 public sealed class LoggingEmailService(ILogger<LoggingEmailService> logger) : IEmailService
 {

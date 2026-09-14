@@ -3,10 +3,10 @@ using Amazon.S3.Model;
 
 namespace Aura.Api.Services;
 
-public sealed class MediaStorage(IAmazonS3 s3, IConfiguration configuration)
+public sealed class MediaStorage(IAmazonS3 s3, IConfiguration configuration) : IMediaStorage
 {
     private readonly string _bucket = configuration["AWS:BucketName"]!;
-    public async Task<(string uploadId, IReadOnlyList<string> urls)> BeginAsync(string key, string contentType, long size)
+    public async Task<(string UploadId, IReadOnlyList<string> Urls)> BeginAsync(string key, string contentType, long size)
     {
         var init = await s3.InitiateMultipartUploadAsync(new InitiateMultipartUploadRequest { BucketName = _bucket, Key = key, ContentType = contentType });
         const long partSize = 10 * 1024 * 1024;

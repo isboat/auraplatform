@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Aura.Api.Services;
 
-public sealed class TokenService(IConfiguration configuration)
+public sealed class TokenService(IConfiguration configuration) : ITokenService
 {
     public string Create(UserDocument user)
     {
