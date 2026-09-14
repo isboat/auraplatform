@@ -38,11 +38,12 @@ Anonymous users can access hosted media without signing in. They can view images
 
 ### Signed-In Users
 
-Signed-in users have the same access to hosted media as anonymous users. They can also engage with media by:
+Signed-in users have the same access to hosted media as anonymous users. They can also:
 
-- Leaving comments in a media item's comments section
-- Liking or disliking media
-- Sharing media
+- Leave comments in a media item's comments section
+- Like or dislike media
+- Share media
+- Delete media they uploaded
 
 ## Views and Engagement
 
