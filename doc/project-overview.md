@@ -17,7 +17,7 @@ All users can browse and interact with the hosted media in the appropriate forma
 The upload page allows users to provide the following information for each video, image, or audio upload:
 
 - Title (optional)
-- Description
+- Description (maximum 255 characters)
 - Tags
 
 If a title is not provided, the backend generates one from the current date and time. The time portion uses the `hh mm ss` format.
@@ -138,8 +138,8 @@ The interface is responsive across mobile phones, tablets, and laptops. Layouts 
 
 ## Technology Stack
 
-- **Backend:** C# with an ASP.NET Core Web API
-- **Frontend:** React
+- **Backend:** C# with an ASP.NET Core Web API targeting .NET 10
+- **Frontend:** The latest stable version of React
 - **Database:** MongoDB
 - **Media storage:** Amazon S3
 
