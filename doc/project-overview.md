@@ -100,6 +100,15 @@ Comments are retrieved in batches rather than all at once. Additional batches lo
 
 Aura Platform displays advertisements as part of its media hosting experience. Ads appear on the platform alongside hosted media and its related features.
 
+## Static Legal Pages
+
+The React frontend includes the following static pages:
+
+- Privacy
+- Terms of Use
+
+These pages are rendered from frontend content and do not require content to be fetched from the backend API.
+
 ## Design and Styling
 
 Aura Platform uses modern design and styling to provide a contemporary experience throughout the platform. Its visual presentation supports browsing, viewing, listening to, and interacting with hosted media.
