@@ -38,6 +38,7 @@ Aura Platform uses modern design and styling to provide a contemporary experienc
 
 - **Backend:** C# with an ASP.NET Core Web API
 - **Frontend:** React
+- **Database:** MongoDB
 
 ## Purpose
 
