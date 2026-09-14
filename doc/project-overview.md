@@ -24,6 +24,12 @@ If a title is not provided, the backend generates one from the current date and 
 
 Tags make uploaded content discoverable through search. Users can search by tag to find matching videos, images, or audio.
 
+## Media Storage and Large Uploads
+
+Media assets are stored as objects in an Amazon S3 bucket. The upload workflow is designed to transfer videos, images, and audio efficiently and reliably without routing entire large files through application memory.
+
+Large files use multipart uploads so that file parts can be uploaded independently. If a transfer is interrupted, the platform can retry failed parts instead of restarting the complete upload.
+
 ## User Access
 
 ### Anonymous Users
@@ -63,6 +69,7 @@ The interface is responsive across mobile phones, tablets, and laptops. Layouts 
 - **Backend:** C# with an ASP.NET Core Web API
 - **Frontend:** React
 - **Database:** MongoDB
+- **Media storage:** Amazon S3
 
 ## Purpose
 
