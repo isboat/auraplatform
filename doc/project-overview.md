@@ -56,6 +56,8 @@ Aura Platform displays advertisements as part of its media hosting experience. A
 
 Aura Platform uses modern design and styling to provide a contemporary experience throughout the platform. Its visual presentation supports browsing, viewing, listening to, and interacting with hosted media.
 
+The interface is responsive across mobile phones, tablets, and laptops. Layouts and media experiences adapt to each device's screen size so that platform features remain accessible and usable.
+
 ## Technology Stack
 
 - **Backend:** C# with an ASP.NET Core Web API
