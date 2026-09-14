@@ -24,11 +24,17 @@ If a title is not provided, the backend generates one from the current date and 
 
 Tags make uploaded content discoverable through search. Users can search by tag to find matching videos, images, or audio.
 
+The upload page displays a responsibility notice: **You are responsible for the media you upload.**
+
 ## Media Storage and Large Uploads
 
 Media assets are stored as objects in an Amazon S3 bucket. The upload workflow is designed to transfer videos, images, and audio efficiently and reliably without routing entire large files through application memory.
 
 Large files use multipart uploads so that file parts can be uploaded independently. If a transfer is interrupted, the platform can retry failed parts instead of restarting the complete upload.
+
+## Content Review
+
+Every upload is submitted for review by platform administrators. While an upload is awaiting review, users can still find it through search, but the media is covered by an **In review** status message.
 
 ## Account Registration and Verification
 
