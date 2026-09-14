@@ -16,9 +16,11 @@ All users can browse and interact with the hosted media in the appropriate forma
 
 The homepage organizes media into multiple discovery sections. Each section displays up to 10 items, including:
 
-- Latest uploads
+- Latest approved media
 - Most-viewed media
 - Most-liked media
+
+The latest-media section includes only uploads that platform administrators have approved; media still awaiting review is excluded.
 
 Additional discovery sections can follow the same limited, ranked format as the platform evolves.
 
