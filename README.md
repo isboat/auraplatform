@@ -5,7 +5,7 @@ Aura is a responsive media-hosting platform for videos, images, and audio. It in
 ## Projects
 
 - `backend/Aura.Api` — .NET 10 ASP.NET Core minimal API backed by MongoDB and Amazon S3.
-- `frontend` — React and Vite single-page frontend.
+- `frontend` — TypeScript, React, and Vite single-page frontend connected to the backend API.
 - `doc/project-overview.md` — product and architecture requirements.
 
 ## Frontend
@@ -16,7 +16,7 @@ npm install
 npm run dev
 ```
 
-The frontend runs at `http://localhost:5173`. Representative local content allows the interface to be explored without backend infrastructure.
+The frontend runs at `http://localhost:5173`. Set `VITE_API_URL` when the API is not available at the default `http://localhost:5080/api` address. The frontend reads media, authentication, configuration, upload, reaction, and comment data from the API; it does not ship demo media.
 
 ## Backend
 
@@ -46,6 +46,7 @@ Dependencies are registered in `Program.cs`, which serves only as the applicatio
 ```bash
 cd frontend
 npm run lint
+npm run typecheck
 npm run build
 npm run test:e2e
 ```
