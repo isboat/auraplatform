@@ -72,6 +72,17 @@ Signed-in users have the same access to hosted media as anonymous users. They ca
 - Share media
 - Delete media they uploaded
 
+## My Uploads
+
+Signed-in users have a **My Uploads** page that lists all media they have uploaded. Each upload displays:
+
+- Number of views
+- Number of likes
+- Number of dislikes
+- Number of comments
+
+Each item also provides an option for the user to delete that upload.
+
 ## Direct Content Links
 
 Each media item has a direct content-page URL. When a user pastes or opens that URL in a browser, the platform resolves the route and takes the user directly to the corresponding video, image, or audio page instead of redirecting them to the platform's home page.
