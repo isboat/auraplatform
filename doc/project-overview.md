@@ -30,6 +30,16 @@ Media assets are stored as objects in an Amazon S3 bucket. The upload workflow i
 
 Large files use multipart uploads so that file parts can be uploaded independently. If a transfer is interrupted, the platform can retry failed parts instead of restarting the complete upload.
 
+## Account Registration and Verification
+
+Users can create an account by completing a registration form with:
+
+- Name
+- Email address, used as the username
+- Password
+
+After registration, the platform sends a verification email containing a link to the email verification page. The user follows the link to verify their email address, and successful verification completes the account setup.
+
 ## User Access
 
 ### Anonymous Users
