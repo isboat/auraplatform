@@ -12,6 +12,16 @@ Aura Platform supports the following media types:
 
 All users can browse and interact with the hosted media in the appropriate format: they can view images, listen to audio, and watch videos.
 
+## Homepage
+
+The homepage organizes media into multiple discovery sections. Each section displays up to 10 items, including:
+
+- Latest uploads
+- Most-viewed media
+- Most-liked media
+
+Additional discovery sections can follow the same limited, ranked format as the platform evolves.
+
 ## Uploads and Content Discovery
 
 The upload page allows users to provide the following information for each video, image, or audio upload:
