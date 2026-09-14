@@ -16,9 +16,11 @@ All users can browse and interact with the hosted media in the appropriate forma
 
 The upload page allows users to provide the following information for each video, image, or audio upload:
 
-- Title
+- Title (optional)
 - Description
 - Tags
+
+If a title is not provided, the backend generates one from the current date and time. The time portion uses the `hh mm ss` format.
 
 Tags make uploaded content discoverable through search. Users can search by tag to find matching videos, images, or audio.
 
