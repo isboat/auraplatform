@@ -30,6 +30,10 @@ Signed-in users have the same access to hosted media as anonymous users. They ca
 
 Aura Platform displays advertisements as part of its media hosting experience. Ads appear on the platform alongside hosted media and its related features.
 
+## Design and Styling
+
+Aura Platform uses modern design and styling to provide a contemporary experience throughout the platform. Its visual presentation supports browsing, viewing, listening to, and interacting with hosted media.
+
 ## Purpose
 
 The platform provides a central place for hosting different types of media while allowing the public to consume that content. User accounts add community and sharing features without restricting anonymous access to the hosted media.
