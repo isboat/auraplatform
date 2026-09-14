@@ -48,6 +48,15 @@ Users can create an account by completing a registration form with:
 
 After registration, the platform sends a verification email containing a link to the email verification page. The user follows the link to verify their email address, and successful verification completes the account setup.
 
+## Sign In and Authentication
+
+The platform provides a sign-in page where users enter:
+
+- Their email address as the username
+- Their password
+
+After a successful sign-in, the backend issues a JSON Web Token (JWT). The client includes this token with subsequent requests that require an authenticated user, allowing the backend to authorize access to protected platform features.
+
 ## Administrative Configuration
 
 Administrators can independently turn off:
