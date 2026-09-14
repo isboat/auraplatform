@@ -26,6 +26,10 @@ Signed-in users have the same access to hosted media as anonymous users. They ca
 - Liking media
 - Sharing media
 
+## Advertising
+
+Aura Platform displays advertisements as part of its media hosting experience. Ads appear on the platform alongside hosted media and its related features.
+
 ## Purpose
 
 The platform provides a central place for hosting different types of media while allowing the public to consume that content. User accounts add community and sharing features without restricting anonymous access to the hosted media.
