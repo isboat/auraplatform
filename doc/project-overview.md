@@ -72,6 +72,10 @@ Signed-in users have the same access to hosted media as anonymous users. They ca
 - Share media
 - Delete media they uploaded
 
+## Direct Content Links
+
+Each media item has a direct content-page URL. When a user pastes or opens that URL in a browser, the platform resolves the route and takes the user directly to the corresponding video, image, or audio page instead of redirecting them to the platform's home page.
+
 ## Views and Engagement
 
 The platform keeps track of the number of views for each video, image, and audio item. An engagement summary displayed below the content shows:
