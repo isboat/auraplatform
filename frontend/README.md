@@ -103,7 +103,11 @@ cd frontend
 VITE_API_URL=https://api.example.com/api npm run build
 ```
 
-Deploy the generated `dist/` directory to a static host. Configure the host to route unknown application paths, such as `/media/{id}`, back to `index.html` so pasted direct-content URLs load the SPA correctly.
+Deploy the generated `dist/` directory to a static host. Vite copies
+`public/staticwebapp.config.json` into the build artifact so Azure Static Web Apps
+routes unknown application paths, such as `/media/{id}`, back to `index.html` and
+pasted direct-content URLs load the SPA correctly. Configure an equivalent fallback
+when deploying to a different static host.
 
 ## GitHub Actions deployment
 

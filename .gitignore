@@ -530,6 +530,8 @@ out
 # Gatsby files (if applicable)
 .cache/
 public
+!frontend/public/
+!frontend/public/staticwebapp.config.json
 
 # Storybook build output (if applicable)
 storybook-static
