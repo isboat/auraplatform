@@ -36,6 +36,43 @@ test('video player and lazy backend comments render', async ({ page }) => {
   await expect(page.locator('.comment-list')).toContainText('Beautiful work.');
 });
 
+test('share button opens the native share dialog with media details', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: async (data: ShareData) => { (window as Window & { sharedMedia?: ShareData }).sharedMedia = data; }
+    });
+  });
+  await page.goto('/media/northern-lights', { waitUntil: 'domcontentloaded' });
+
+  await page.getByRole('button', { name: 'Share media' }).click();
+
+  await expect(page.getByRole('button', { name: 'Shared' })).toBeVisible();
+  const shared = await page.evaluate(() => (window as Window & { sharedMedia?: ShareData }).sharedMedia);
+  expect(shared).toEqual({
+    title: video.title,
+    text: video.description,
+    url: 'http://127.0.0.1:4173/media/northern-lights'
+  });
+});
+
+test('share button copies the content link when native sharing is unavailable', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: async (value: string) => { (window as Window & { copiedLink?: string }).copiedLink = value; } }
+    });
+  });
+  await page.goto('/media/northern-lights', { waitUntil: 'domcontentloaded' });
+
+  await page.getByRole('button', { name: 'Share media' }).click();
+
+  await expect(page.getByRole('button', { name: 'Link copied' })).toBeVisible();
+  expect(await page.evaluate(() => (window as Window & { copiedLink?: string }).copiedLink))
+    .toBe('http://127.0.0.1:4173/media/northern-lights');
+});
+
 test('audio player and unavailable media states render', async ({ page }) => {
   await page.goto('/media/after-rain', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('audio[controls]')).toHaveCount(1);

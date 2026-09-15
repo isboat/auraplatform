@@ -25,6 +25,7 @@ export default function MediaPage({ id }: { id: string }) {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [body, setBody] = useState('');
   const [hasMore, setHasMore] = useState(true);
+  const [shareStatus, setShareStatus] = useState('');
   useEffect(() => { api.media(id).then(setMedia).catch((reason: ApiError) => setError(reason.status === 404 ? 'This content could not be found.' : reason.message)); }, [id]);
   const loadComments = async () => {
     setCommentsLoading(true);
@@ -32,7 +33,33 @@ export default function MediaPage({ id }: { id: string }) {
   };
   const submit = async (event: FormEvent) => { event.preventDefault(); if (!body.trim()) return; try { const comment = await api.addComment(id, body); setComments(current => [comment, ...current]); setBody(''); setMedia(current => current ? { ...current, comments: current.comments + 1 } : current); } catch (reason) { setError((reason as Error).message); } };
   const react = async (value: 'like' | 'dislike') => { if (!user) { location.href = '/signin'; return; } try { await api.react(id, value === 'like'); setReaction(value); } catch (reason) { setError((reason as Error).message); } };
+  const share = async () => {
+    const url = location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: media?.title ?? 'Aura media', text: media?.description || undefined, url });
+        setShareStatus('Shared');
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        setShareStatus('Link copied');
+      } else {
+        const input = document.createElement('textarea');
+        input.value = url;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        const copied = document.execCommand('copy');
+        input.remove();
+        if (!copied) throw new Error('Copy command was unavailable.');
+        setShareStatus('Link copied');
+      }
+    } catch (reason) {
+      if (reason instanceof DOMException && reason.name === 'AbortError') return;
+      setError('The share action could not be completed. Please try again.');
+    }
+  };
   if (error && !media) return <ErrorState title="Media not found" message={error} />;
   if (!media) return <LoadingState />;
-  return <article className="content-page"><div className="content-title"><span className="eyebrow">{media.mediaType} · {media.ownerName}</span><h1>{media.title}</h1></div><div className="viewer"><MediaPlayer media={media} /></div><div className="engagement"><div><span><Eye />{compact(media.views)} views</span><button className={reaction === 'like' ? 'active' : ''} onClick={() => react('like')}><ThumbsUp />{compact(media.likes + (reaction === 'like' ? 1 : 0))}</button><button className={reaction === 'dislike' ? 'active' : ''} onClick={() => react('dislike')}><ThumbsDown />{media.dislikes + (reaction === 'dislike' ? 1 : 0)}</button></div><button onClick={() => navigator.clipboard?.writeText(location.href)}><Share2 />Share</button></div>{error && <p className="inline-error">{error}</p>}<section className="description"><h2>About this media</h2><p>{media.description || 'No description was provided.'}</p><div className="tags">{media.tags.map(tag => <a href={`/search?tag=${encodeURIComponent(tag)}`} key={tag}>#{tag}</a>)}</div></section><section className="comments"><div className="comments-title"><div><span className="eyebrow">Conversation</span><h2>{media.comments} comments</h2></div>{!showComments && <button className="button ghost" disabled={commentsLoading} onClick={loadComments}><MessageCircle />{commentsLoading ? 'Loading…' : 'Show comments'}</button>}</div>{showComments && <>{user ? <form className="comment-form" onSubmit={submit}><span className="avatar">{user.name[0].toUpperCase()}</span><input value={body} onChange={event => setBody(event.target.value)} placeholder="Add to the conversation…" /><button aria-label="Post comment"><Send /></button></form> : <p className="notice"><a href="/signin">Sign in</a> to join the conversation.</p>}<div className="comment-list">{comments.map(comment => <div className="comment" key={comment.id}><span className="avatar">{comment.userName[0]}</span><div><strong>{comment.userName}</strong><time>{new Date(comment.createdAt).toLocaleString()}</time><p>{comment.body}</p></div></div>)}</div>{hasMore && <button className="button ghost load-more" disabled={commentsLoading} onClick={loadComments}>{commentsLoading ? 'Loading…' : 'Load more comments'}</button>}</>}</section></article>;
+  return <article className="content-page"><div className="content-title"><span className="eyebrow">{media.mediaType} · {media.ownerName}</span><h1>{media.title}</h1></div><div className="viewer"><MediaPlayer media={media} /></div><div className="engagement"><div><span><Eye />{compact(media.views)} views</span><button className={reaction === 'like' ? 'active' : ''} onClick={() => react('like')}><ThumbsUp />{compact(media.likes + (reaction === 'like' ? 1 : 0))}</button><button className={reaction === 'dislike' ? 'active' : ''} onClick={() => react('dislike')}><ThumbsDown />{media.dislikes + (reaction === 'dislike' ? 1 : 0)}</button></div><div className="share-action"><button type="button" className={shareStatus ? 'active' : ''} onClick={share} aria-label={shareStatus || 'Share media'}><Share2 />{shareStatus || 'Share'}</button><span className="visually-hidden" role="status" aria-live="polite">{shareStatus}</span></div></div>{error && <p className="inline-error">{error}</p>}<section className="description"><h2>About this media</h2><p>{media.description || 'No description was provided.'}</p><div className="tags">{media.tags.map(tag => <a href={`/search?tag=${encodeURIComponent(tag)}`} key={tag}>#{tag}</a>)}</div></section><section className="comments"><div className="comments-title"><div><span className="eyebrow">Conversation</span><h2>{media.comments} comments</h2></div>{!showComments && <button className="button ghost" disabled={commentsLoading} onClick={loadComments}><MessageCircle />{commentsLoading ? 'Loading…' : 'Show comments'}</button>}</div>{showComments && <>{user ? <form className="comment-form" onSubmit={submit}><span className="avatar">{user.name[0].toUpperCase()}</span><input value={body} onChange={event => setBody(event.target.value)} placeholder="Add to the conversation…" /><button aria-label="Post comment"><Send /></button></form> : <p className="notice"><a href="/signin">Sign in</a> to join the conversation.</p>}<div className="comment-list">{comments.map(comment => <div className="comment" key={comment.id}><span className="avatar">{comment.userName[0]}</span><div><strong>{comment.userName}</strong><time>{new Date(comment.createdAt).toLocaleString()}</time><p>{comment.body}</p></div></div>)}</div>{hasMore && <button className="button ghost load-more" disabled={commentsLoading} onClick={loadComments}>{commentsLoading ? 'Loading…' : 'Load more comments'}</button>}</>}</section></article>;
 }
