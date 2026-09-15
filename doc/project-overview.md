@@ -167,3 +167,5 @@ The interface is responsive across mobile phones, tablets, and laptops. Layouts 
 ## Purpose
 
 The platform provides a central place for hosting different types of media while allowing the public to consume that content. User accounts add community and sharing features without restricting anonymous access to the hosted media.
+
+Administrative and content-review workflows are defined separately in the [Management Dashboard](management-dashboard.md) requirements.

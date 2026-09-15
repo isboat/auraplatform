@@ -7,6 +7,7 @@ Aura is a responsive media-hosting platform for videos, images, and audio. It in
 - [`backend/Aura.Api`](backend/README.md) — .NET 10 ASP.NET Core controller API backed by MongoDB and configurable Amazon S3 or Azure Blob Storage.
 - [`frontend`](frontend/README.md) — TypeScript, React, and Vite single-page frontend connected to the backend API.
 - `doc/project-overview.md` — product and architecture requirements.
+- [`doc/management-dashboard.md`](doc/management-dashboard.md) — requirements for the .NET MVC administration and content-review application.
 
 ## Frontend
 
