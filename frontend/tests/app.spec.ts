@@ -44,3 +44,12 @@ test('audio player and unavailable media states render', async ({ page }) => {
   await page.goto('/media/in-review', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: 'Media unavailable' })).toBeVisible();
 });
+
+test('backend failures display a dismissible UI message', async ({ page }) => {
+  await page.unroute('http://localhost:5080/api/**');
+  await page.route('http://localhost:5080/api/**', route => route.fulfill({ status: 503, json: { detail: 'The media service is temporarily unavailable.' } }));
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('alert')).toContainText('The media service is temporarily unavailable.');
+  await page.getByRole('button', { name: 'Dismiss error' }).click();
+  await expect(page.getByRole('alert')).toHaveCount(0);
+});

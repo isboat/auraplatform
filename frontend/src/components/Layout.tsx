@@ -2,12 +2,14 @@ import { Headphones, Home, Search, Upload, UserRound, LogOut, Menu, X, Shield } 
 import { useState, type ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useConfiguration } from '../hooks';
+import ApiErrorBanner from './ApiErrorBanner';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const { user, signOut } = useAuth();
   const configuration = useConfiguration();
   const [open, setOpen] = useState(false);
   return <div className="app-shell">
+    <ApiErrorBanner />
     <header>
       <a className="brand" href="/"><span className="brand-mark"><Headphones size={20} /></span><span>aura</span></a>
       <nav className={open ? 'open' : ''}>

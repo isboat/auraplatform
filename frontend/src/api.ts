@@ -7,15 +7,41 @@ export class ApiError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
+type ErrorListener = (error: ApiError | null) => void;
+const errorListeners = new Set<ErrorListener>();
+let latestError: ApiError | null = null;
+
+function reportError(status: number, message: string) {
+  latestError = new ApiError(status, message);
+  errorListeners.forEach(listener => listener(latestError));
+  return latestError;
+}
+
+export function subscribeToApiErrors(listener: ErrorListener) {
+  errorListeners.add(listener);
+  listener(latestError);
+  return () => { errorListeners.delete(listener); };
+}
+
+export function clearApiError() {
+  latestError = null;
+  errorListeners.forEach(listener => listener(null));
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('aura-token');
   const headers = new Headers(options.headers);
   if (!(options.body instanceof Blob) && options.body !== undefined) headers.set('Content-Type', 'application/json');
   if (token) headers.set('Authorization', `Bearer ${token}`);
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers });
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}${path}`, { ...options, headers });
+  } catch {
+    throw reportError(0, 'Unable to reach the Aura service. Check your connection and try again.');
+  }
   if (!response.ok) {
     const problem = await response.json().catch(() => null) as { detail?: string; message?: string; title?: string } | null;
-    throw new ApiError(response.status, problem?.detail ?? problem?.message ?? problem?.title ?? 'The request could not be completed.');
+    throw reportError(response.status, problem?.detail ?? problem?.message ?? problem?.title ?? 'The request could not be completed. Please try again.');
   }
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
@@ -39,8 +65,13 @@ export const api = {
     const parts: { partNumber: number; eTag: string }[] = [];
     for (let index = 0; index < started.partUrls.length; index += 1) {
       const chunk = file.slice(index * PART_SIZE, Math.min(file.size, (index + 1) * PART_SIZE));
-      const response = await fetch(started.partUrls[index], { method: 'PUT', body: chunk });
-      if (!response.ok) throw new ApiError(response.status, `Upload part ${index + 1} failed.`);
+      let response: Response;
+      try {
+        response = await fetch(started.partUrls[index], { method: 'PUT', body: chunk });
+      } catch {
+        throw reportError(0, `Upload part ${index + 1} could not be sent. Check your connection and retry the upload.`);
+      }
+      if (!response.ok) throw reportError(response.status, `Upload part ${index + 1} failed. Please retry the upload.`);
       parts.push({ partNumber: index + 1, eTag: response.headers.get('ETag')?.replaceAll('"', '') ?? '' });
       onProgress(Math.round(((index + 1) / started.partUrls.length) * 100));
     }
