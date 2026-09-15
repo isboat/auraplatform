@@ -6,6 +6,7 @@ Aura is a responsive media-hosting platform for videos, images, and audio. It in
 
 - [`backend/Aura.Api`](backend/README.md) — .NET 10 ASP.NET Core controller API backed by MongoDB and configurable Amazon S3 or Azure Blob Storage.
 - [`frontend`](frontend/README.md) — TypeScript, React, and Vite single-page frontend connected to the backend API.
+- [`dashboard`](dashboard/README.md) — .NET 10 ASP.NET Core MVC management dashboard for staff workflows.
 - `doc/project-overview.md` — product and architecture requirements.
 - [`doc/management-dashboard.md`](doc/management-dashboard.md) — requirements for the .NET MVC administration and content-review application.
 
@@ -85,3 +86,26 @@ Backend unit tests enforce a minimum of 90% line coverage for the application se
 ```bash
 dotnet test AuraPlatform.slnx
 ```
+
+## Continuous deployment
+
+Three independent GitHub Actions workflows build and test pull requests that affect
+their application. On pushes to `main`, a successful build and test run deploys that
+application:
+
+| Workflow | Azure target | Required repository configuration |
+| --- | --- | --- |
+| `Backend API` | Azure Web App | Variable `AZURE_BACKEND_APP_NAME`; secret `AZURE_BACKEND_PUBLISH_PROFILE` |
+| `Frontend` | Azure Static Web Apps | Variable `VITE_API_URL`; secret `AZURE_STATIC_WEB_APPS_API_TOKEN` |
+| `Management Dashboard` | Azure Web App | Variable `AZURE_DASHBOARD_APP_NAME`; secret `AZURE_DASHBOARD_PUBLISH_PROFILE` |
+
+Create the variables and secrets under **Settings → Secrets and variables →
+Actions**. Download each Web App's publish profile from Azure and store the complete
+XML document in its corresponding secret. Obtain the Static Web App deployment token
+from the Azure resource. GitHub environments named `backend-production`,
+`frontend-production`, and `dashboard-production` can optionally be configured with
+deployment protection rules.
+
+Azure application settings such as MongoDB credentials, signing keys, storage
+credentials, and bootstrap tokens belong on their target Web App; do not add them as
+build-time GitHub variables or commit them to this repository.
