@@ -46,7 +46,9 @@ AzureStorage__ConnectionString='DefaultEndpointsProtocol=...'
 AzureStorage__ContainerName=aura-media
 ```
 
-Azure uploads use blocks with short-lived SAS URLs, allowing large media to continue using the frontend's chunked upload flow. The Azure Storage account must allow browser CORS requests from the frontend origin and expose the `PUT` method and `ETag` response header. The configured connection string must include credentials that can create the container, create SAS URLs, stage and commit blocks, read blobs, and delete blobs.
+Azure uploads use blocks with authorized URLs, allowing large media to continue using the frontend's chunked upload flow. A connection string containing an `AccountKey` generates short-lived SAS URLs. A connection string containing `SharedAccessSignature` reuses that service SAS because Azure cannot generate another SAS without a shared key; ensure it grants create, write, read, and delete permissions and choose its expiration carefully. The API now reports a clear configuration error if neither credential is available instead of raising `sharedKeyCredential` as a null argument.
+
+The Azure Storage account must also allow browser CORS requests from the frontend origin and expose the `PUT` method and `ETag` response header. The configured credentials must be able to create the container, stage and commit blocks, read blobs, and delete blobs.
 
 When the API runs in the Development environment, interactive Swagger documentation is available at `http://localhost:5080/swagger`. The underlying OpenAPI document is available at `http://localhost:5080/swagger/v1/swagger.json`.
 
