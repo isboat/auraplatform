@@ -55,6 +55,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = async context =>
+        {
+            var userId = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ??
+                context.Principal?.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+            var versionValue = context.Principal?.FindFirst("session_version")?.Value;
+            if (userId is null || !int.TryParse(versionValue, out var version) ||
+                !await context.HttpContext.RequestServices.GetRequiredService<IUserRepository>().IsSessionValidAsync(userId, version))
+                context.Fail("This session is no longer valid.");
+        }
+    };
 });
 builder.Services.AddAuthorization();
 

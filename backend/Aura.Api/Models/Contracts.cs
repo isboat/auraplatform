@@ -2,6 +2,8 @@ namespace Aura.Api.Models;
 
 public record RegisterRequest(string Name, string Email, string Password);
 public record LoginRequest(string Email, string Password);
+public record ForgotPasswordRequest(string Email);
+public record ResetPasswordRequest(string Token, string Password, string ConfirmPassword);
 public record UploadRequest(string? Title, string Description, List<string>? Tags, string FileName, string ContentType, long FileSize);
 public record CompleteUploadRequest(string UploadId, List<UploadedPart> Parts);
 public record UploadedPart(int PartNumber, string ETag);

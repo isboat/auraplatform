@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Aura.Api.Controllers;
 
 [ApiController, Route("api/auth")]
-public sealed class AuthController(IAuthService auth) : ControllerBase
+public sealed class AuthController(IAuthService auth, IConfiguration configuration) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<ActionResult<MessageResponse>> Register(RegisterRequest request)
@@ -19,4 +19,14 @@ public sealed class AuthController(IAuthService auth) : ControllerBase
 
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login(LoginRequest request) => Ok(await auth.LoginAsync(request));
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult<MessageResponse>> ForgotPassword(ForgotPasswordRequest request)
+    {
+        var frontendUrl = (configuration["FrontendUrl"] ?? "http://localhost:5173").TrimEnd('/');
+        return Accepted(await auth.ForgotPasswordAsync(request, $"{frontendUrl}/reset-password"));
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult<MessageResponse>> ResetPassword(ResetPasswordRequest request) => Ok(await auth.ResetPasswordAsync(request));
 }
