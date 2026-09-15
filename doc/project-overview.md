@@ -162,7 +162,7 @@ The interface is responsive across mobile phones, tablets, and laptops. Layouts 
 - **Backend:** C# with an ASP.NET Core Web API targeting .NET 10
 - **Frontend:** The latest stable version of React
 - **Database:** MongoDB
-- **Media storage:** Amazon S3
+- **Media storage:** Amazon S3 or Azure Blob Storage, selected through backend configuration
 
 ## Purpose
 

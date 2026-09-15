@@ -13,7 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<MongoContext>();
 builder.Services.AddSingleton<IMongoHealthProbe>(services => services.GetRequiredService<MongoContext>());
 builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(RegionEndpoint.GetBySystemName(builder.Configuration["AWS:Region"] ?? "us-east-1")));
-builder.Services.AddSingleton<IMediaStorage, MediaStorage>();
+builder.Services.AddSingleton<IMediaStorage>(services =>
+{
+    var provider = (builder.Configuration["MediaStorage:Provider"] ?? "S3").Trim();
+    return provider.ToUpperInvariant() switch
+    {
+        "S3" => ActivatorUtilities.CreateInstance<S3MediaStorage>(services),
+        "AZURE" => ActivatorUtilities.CreateInstance<AzureBlobMediaStorage>(services),
+        _ => throw new InvalidOperationException($"Unsupported media storage provider '{provider}'. Use 'S3' or 'Azure'.")
+    };
+});
 builder.Services.AddSingleton<IEmailService, LoggingEmailService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
@@ -32,7 +41,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks()
     .AddCheck<MongoDbHealthCheck>("mongodb", tags: ["database"])
-    .AddCheck<S3HealthCheck>("s3", tags: ["storage"]);
+    .AddCheck<MediaStorageHealthCheck>("media-storage", tags: ["storage"]);
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins(builder.Configuration["FrontendUrl"] ?? "http://localhost:5173")));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

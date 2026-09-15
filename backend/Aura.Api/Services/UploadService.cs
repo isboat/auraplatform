@@ -1,4 +1,3 @@
-using Amazon.S3.Model;
 using Aura.Api.Common;
 using Aura.Api.Models;
 using Aura.Api.Repositories;
@@ -15,14 +14,14 @@ public sealed class UploadService(IMediaRepository media, IUserRepository users,
         var user = await users.FindByIdAsync(userId) ?? throw new ServiceException(401, "User account was not found.");
         var key = $"{user.Id}/{Guid.NewGuid():N}/{Path.GetFileName(request.FileName)}";
         var transfer = await storage.BeginAsync(key, request.ContentType, request.FileSize);
-        var item = new MediaDocument { OwnerId = user.Id!, OwnerName = user.Name, Title = string.IsNullOrWhiteSpace(request.Title) ? clock.UtcNow.ToString("yyyy-MM-dd hh mm ss") : request.Title.Trim(), Description = request.Description, Tags = request.Tags?.Select(x => x.Trim().ToLowerInvariant()).Where(x => x.Length > 0).Distinct().ToList() ?? [], MediaType = request.ContentType.Split('/')[0], ObjectKey = key, CreatedAt = clock.UtcNow };
+        var item = new MediaDocument { OwnerId = user.Id!, OwnerName = user.Name, Title = string.IsNullOrWhiteSpace(request.Title) ? clock.UtcNow.ToString("yyyy-MM-dd hh mm ss") : request.Title.Trim(), Description = request.Description, Tags = request.Tags?.Select(x => x.Trim().ToLowerInvariant()).Where(x => x.Length > 0).Distinct().ToList() ?? [], MediaType = request.ContentType.Split('/')[0], ContentType = request.ContentType, ObjectKey = key, CreatedAt = clock.UtcNow };
         await media.AddAsync(item);
         return new(item.Id!, transfer.UploadId, transfer.Urls, "Your media is under review.");
     }
     public async Task<MessageResponse> CompleteAsync(string id, CompleteUploadRequest request, string userId)
     {
         var item = await media.FindOwnedAsync(id, userId) ?? throw new ServiceException(404, "Media was not found.");
-        await storage.CompleteAsync(item.ObjectKey, request.UploadId, request.Parts.Select(x => new PartETag(x.PartNumber, x.ETag)));
+        await storage.CompleteAsync(item.ObjectKey, item.ContentType, request.UploadId, request.Parts);
         return new("Your media is under review.");
     }
 }

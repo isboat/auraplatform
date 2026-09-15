@@ -1,5 +1,3 @@
-using Amazon.S3;
-using Amazon.S3.Model;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Aura.Api.Services;
@@ -22,25 +20,20 @@ public sealed class MongoDbHealthCheck(IMongoHealthProbe mongo) : IHealthCheck
     }
 }
 
-public sealed class S3HealthCheck(IAmazonS3 s3, IConfiguration configuration) : IHealthCheck
+public sealed class MediaStorageHealthCheck(IMediaStorage storage) : IHealthCheck
 {
-    private readonly string _bucketName = configuration["AWS:BucketName"]
-        ?? throw new InvalidOperationException("AWS:BucketName must be configured.");
-
     public async Task<HealthCheckResult> CheckHealthAsync(
         HealthCheckContext healthCheckContext,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            await s3.GetBucketLocationAsync(
-                new GetBucketLocationRequest { BucketName = _bucketName },
-                cancellationToken);
-            return HealthCheckResult.Healthy("Amazon S3 is reachable.");
+            await storage.CheckHealthAsync(cancellationToken);
+            return HealthCheckResult.Healthy("Media storage is reachable.");
         }
         catch (Exception exception)
         {
-            return HealthCheckResult.Unhealthy("Amazon S3 is unavailable.", exception);
+            return HealthCheckResult.Unhealthy("Media storage is unavailable.", exception);
         }
     }
 }

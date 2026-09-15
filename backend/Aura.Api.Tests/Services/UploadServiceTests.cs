@@ -1,4 +1,3 @@
-using Amazon.S3.Model;
 using Aura.Api.Common;
 using Aura.Api.Models;
 using Aura.Api.Repositories;
@@ -27,6 +26,6 @@ public sealed class UploadServiceTests
     [Theory, InlineData(0, "video/mp4"), InlineData(1, "")]
     public async Task Begin_rejects_invalid_file(long size, string contentType) { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration()); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().BeginAsync(new(null, "", null, "x", contentType, size), "user")); Assert.Equal(400, e.StatusCode); }
     [Fact] public async Task Begin_rejects_unknown_user() { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration()); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().BeginAsync(new(null, "", null, "x", "video/mp4", 1), "user")); Assert.Equal(401, e.StatusCode); }
-    [Fact] public async Task Complete_finishes_owned_multipart_upload() { var item = TestData.Media(); _media.Setup(x => x.FindOwnedAsync(item.Id!, "user")).ReturnsAsync(item); var result = await Subject().CompleteAsync(item.Id!, new("upload", [new(1, "etag")]), "user"); Assert.Equal("Your media is under review.", result.Message); _storage.Verify(x => x.CompleteAsync(item.ObjectKey, "upload", It.Is<IEnumerable<PartETag>>(parts => parts.Single().PartNumber == 1)), Times.Once); }
+    [Fact] public async Task Complete_finishes_owned_multipart_upload() { var item = TestData.Media(); _media.Setup(x => x.FindOwnedAsync(item.Id!, "user")).ReturnsAsync(item); var result = await Subject().CompleteAsync(item.Id!, new("upload", [new(1, "etag")]), "user"); Assert.Equal("Your media is under review.", result.Message); _storage.Verify(x => x.CompleteAsync(item.ObjectKey, item.ContentType, "upload", It.Is<IReadOnlyList<UploadedPart>>(parts => parts.Single().PartNumber == 1)), Times.Once); }
     [Fact] public async Task Complete_rejects_unknown_media() { var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().CompleteAsync("missing", new("upload", []), "user")); Assert.Equal(404, e.StatusCode); }
 }

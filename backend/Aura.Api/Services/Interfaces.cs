@@ -1,4 +1,3 @@
-using Amazon.S3.Model;
 using Aura.Api.Models;
 
 namespace Aura.Api.Services;
@@ -9,9 +8,10 @@ public interface IClock { DateTime UtcNow { get; } }
 public interface IMediaStorage
 {
     Task<(string UploadId, IReadOnlyList<string> Urls)> BeginAsync(string key, string contentType, long size);
-    Task CompleteAsync(string key, string uploadId, IEnumerable<PartETag> parts);
+    Task CompleteAsync(string key, string contentType, string uploadId, IReadOnlyList<UploadedPart> parts);
     Task DeleteAsync(string key);
     string ReadUrl(string key);
+    Task CheckHealthAsync(CancellationToken cancellationToken);
 }
 public interface IAuthService
 {

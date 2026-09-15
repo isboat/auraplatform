@@ -23,6 +23,7 @@ public sealed class MediaDocument
     public string Description { get; set; } = "";
     public List<string> Tags { get; set; } = [];
     public required string MediaType { get; set; }
+    public string ContentType { get; set; } = "application/octet-stream";
     public required string ObjectKey { get; set; }
     public string ReviewStatus { get; set; } = "InReview";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

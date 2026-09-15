@@ -1,7 +1,4 @@
-using Amazon.S3;
-using Amazon.S3.Model;
 using Aura.Api.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Moq;
 
@@ -35,37 +32,28 @@ public sealed class InfrastructureHealthChecksTests
     }
 
     [Fact]
-    public async Task S3_ReturnsHealthy_WhenBucketIsReachable()
+    public async Task MediaStorage_ReturnsHealthy_WhenProviderIsReachable()
     {
-        var s3 = new Mock<IAmazonS3>();
-        s3.Setup(value => value.GetBucketLocationAsync(
-                It.Is<GetBucketLocationRequest>(request => request.BucketName == "media"),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new GetBucketLocationResponse());
+        var storage = new Mock<IMediaStorage>();
 
-        var result = await new S3HealthCheck(s3.Object, Configuration())
+        var result = await new MediaStorageHealthCheck(storage.Object)
             .CheckHealthAsync(new HealthCheckContext());
 
         Assert.Equal(HealthStatus.Healthy, result.Status);
+        storage.Verify(value => value.CheckHealthAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
-    public async Task S3_ReturnsUnhealthy_WhenBucketRequestFails()
+    public async Task MediaStorage_ReturnsUnhealthy_WhenProviderRequestFails()
     {
-        var s3 = new Mock<IAmazonS3>();
-        s3.Setup(value => value.GetBucketLocationAsync(
-                It.IsAny<GetBucketLocationRequest>(),
-                It.IsAny<CancellationToken>()))
-            .ThrowsAsync(new AmazonS3Exception("offline"));
+        var storage = new Mock<IMediaStorage>();
+        storage.Setup(value => value.CheckHealthAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("offline"));
 
-        var result = await new S3HealthCheck(s3.Object, Configuration())
+        var result = await new MediaStorageHealthCheck(storage.Object)
             .CheckHealthAsync(new HealthCheckContext());
 
         Assert.Equal(HealthStatus.Unhealthy, result.Status);
-        Assert.IsType<AmazonS3Exception>(result.Exception);
+        Assert.IsType<InvalidOperationException>(result.Exception);
     }
-
-    private static IConfiguration Configuration() => new ConfigurationBuilder()
-        .AddInMemoryCollection(new Dictionary<string, string?> { ["AWS:BucketName"] = "media" })
-        .Build();
 }
