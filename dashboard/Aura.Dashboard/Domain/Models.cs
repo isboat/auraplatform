@@ -6,6 +6,7 @@ namespace Aura.Dashboard.Domain;
 public static class Roles { public const string Reviewer = "ContentReviewer"; public const string Administrator = "Administrator"; }
 public static class ReviewStates { public const string InReview = "InReview"; public const string Approved = "Approved"; public const string Rejected = "Rejected"; }
 
+[BsonIgnoreExtraElements]
 public sealed class StaffUser
 {
     [BsonId, BsonRepresentation(BsonType.ObjectId)] public string? Id { get; set; }
@@ -22,6 +23,7 @@ public sealed class StaffUser
     [BsonIgnore] public bool IsReviewer => IsAdmin || Roles.Contains(Domain.Roles.Reviewer);
 }
 
+[BsonIgnoreExtraElements]
 public sealed class ManagedMedia
 {
     [BsonId, BsonRepresentation(BsonType.ObjectId)] public string? Id { get; set; }
@@ -37,6 +39,7 @@ public sealed class ManagedMedia
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
 
+[BsonIgnoreExtraElements]
 public sealed class AuditEvent
 {
     [BsonId, BsonRepresentation(BsonType.ObjectId)] public string? Id { get; set; }
