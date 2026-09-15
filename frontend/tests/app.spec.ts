@@ -136,6 +136,10 @@ test('password reset request uses a privacy-preserving confirmation', async ({ p
 });
 
 test('password reset link lets a user choose and confirm a new password', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('aura-user', JSON.stringify({ id: 'user', name: 'Jamie', email: 'jamie@example.com', isAdministrator: false }));
+    localStorage.setItem('aura-token', 'old-session-token');
+  });
   await page.unroute('http://localhost:5080/api/**');
   await page.route('http://localhost:5080/api/**', async route => {
     const path = new URL(route.request().url()).pathname;
@@ -151,4 +155,24 @@ test('password reset link lets a user choose and confirm a new password', async 
 
   await expect(page.getByRole('heading', { name: 'Password reset' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Continue to sign in' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('aura-token'))).toBeNull();
+});
+
+test('password reset catches mismatched confirmation before calling the API', async ({ page }) => {
+  let resetCalls = 0;
+  await page.unroute('http://localhost:5080/api/**');
+  await page.route('http://localhost:5080/api/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === '/api/configuration') return route.fulfill({ json: { id: 'platform', registrationEnabled: true, uploadsEnabled: true } });
+    resetCalls += 1;
+    return route.fulfill({ json: { message: 'Unexpected request.' } });
+  });
+
+  await page.goto('/reset-password?token=one-time-token', { waitUntil: 'domcontentloaded' });
+  await page.getByLabel('New password', { exact: true }).fill('new-password');
+  await page.getByLabel('Confirm new password').fill('different-password');
+  await page.getByRole('button', { name: 'Reset password' }).click();
+
+  await expect(page.getByRole('alert')).toHaveText('Passwords do not match.');
+  expect(resetCalls).toBe(0);
 });

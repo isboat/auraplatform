@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { api } from '../api';
+import { useAuth } from '../context/AuthContext';
 
 export default function PasswordResetPage({ reset = false }: { reset?: boolean }) {
   const [complete, setComplete] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const { signOut } = useAuth();
   const token = new URLSearchParams(location.search).get('token') ?? '';
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -15,9 +17,16 @@ export default function PasswordResetPage({ reset = false }: { reset?: boolean }
     setError('');
     const data = new FormData(event.currentTarget);
     try {
+      const password = String(data.get('password'));
+      const confirmPassword = String(data.get('confirmPassword'));
+      if (reset && password !== confirmPassword) {
+        setError('Passwords do not match.');
+        return;
+      }
       const response = reset
-        ? await api.resetPassword(token, String(data.get('password')), String(data.get('confirmPassword')))
+        ? await api.resetPassword(token, password, confirmPassword)
         : await api.forgotPassword(String(data.get('email')));
+      if (reset) signOut();
       setMessage(response.message);
       setComplete(true);
     } catch (reason) {

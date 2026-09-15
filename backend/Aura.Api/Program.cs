@@ -61,7 +61,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         {
             var userId = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ??
                 context.Principal?.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
-            var versionValue = context.Principal?.FindFirst("session_version")?.Value;
+            // Tokens issued before session versioning was introduced represent version zero.
+            // This preserves existing sessions until that user's password is actually reset.
+            var versionValue = context.Principal?.FindFirst("session_version")?.Value ?? "0";
             if (userId is null || !int.TryParse(versionValue, out var version) ||
                 !await context.HttpContext.RequestServices.GetRequiredService<IUserRepository>().IsSessionValidAsync(userId, version))
                 context.Fail("This session is no longer valid.");
