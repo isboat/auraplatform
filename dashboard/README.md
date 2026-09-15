@@ -38,3 +38,21 @@ token and password are never written to the audit log.
 ```sh
 dotnet test dashboard/Aura.Dashboard.Tests --collect:"XPlat Code Coverage"
 ```
+
+## GitHub Actions deployment
+
+`.github/workflows/dashboard.yml` runs separate build and test jobs for pull requests
+and pushes that change the dashboard. After both jobs succeed on `main`, its deploy
+job publishes the release artifact to Azure Web App.
+
+Configure these repository Actions values:
+
+- Variable `AZURE_DASHBOARD_APP_NAME`: the Azure Web App resource name.
+- Secret `AZURE_DASHBOARD_PUBLISH_PROFILE`: the complete publish-profile XML
+  downloaded from that Web App.
+
+Configure `ConnectionStrings__MongoDb`, `Mongo__Database`, storage settings, and any
+one-time `Bootstrap__Token` as Azure Web App application settings rather than GitHub
+build variables. Remove the bootstrap token after creating the first administrator.
+Manual runs are available through **Actions → Management Dashboard → Run workflow**;
+deployment still occurs only when the run targets `main`.

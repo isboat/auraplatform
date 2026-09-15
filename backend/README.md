@@ -133,3 +133,22 @@ dotnet build AuraPlatform.slnx --configuration Release
 ```
 
 The xUnit suite is in `backend/Aura.Api.Tests`. Coverlet enforces at least 90% line coverage for the configured application-service classes.
+
+## GitHub Actions deployment
+
+`.github/workflows/backend-api.yml` runs separate build and test jobs for pull
+requests and pushes that change the backend. After both jobs succeed on `main`, its
+deploy job publishes the release artifact to Azure Web App.
+
+Configure these repository Actions values:
+
+- Variable `AZURE_BACKEND_APP_NAME`: the Azure Web App resource name.
+- Secret `AZURE_BACKEND_PUBLISH_PROFILE`: the complete publish-profile XML
+  downloaded from that Web App.
+
+Set all runtime values described in [Configuration](#configuration) as Azure Web App
+application settings. At minimum, replace the development JWT key and provide
+production MongoDB and media-storage credentials. Also set `FrontendUrl` to the
+deployed frontend origin. The workflow intentionally does not handle runtime secrets.
+Manual runs are available through **Actions → Backend API → Run workflow**; deployment
+still occurs only when the run targets `main`.

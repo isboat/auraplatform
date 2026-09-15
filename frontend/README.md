@@ -104,3 +104,21 @@ VITE_API_URL=https://api.example.com/api npm run build
 ```
 
 Deploy the generated `dist/` directory to a static host. Configure the host to route unknown application paths, such as `/media/{id}`, back to `index.html` so pasted direct-content URLs load the SPA correctly.
+
+## GitHub Actions deployment
+
+`.github/workflows/frontend.yml` builds the production bundle and independently runs
+lint, type checking, and the Playwright suite for pull requests and pushes that change
+the frontend. After both jobs succeed on `main`, the prebuilt `dist/` artifact is
+deployed to Azure Static Web Apps.
+
+Configure these repository Actions values:
+
+- Variable `VITE_API_URL`: the deployed backend base URL, including `/api`. This is
+  embedded in the Vite bundle and is not a secret.
+- Secret `AZURE_STATIC_WEB_APPS_API_TOKEN`: the deployment token from the Azure Static
+  Web App resource.
+
+The backend `FrontendUrl` setting and the media storage CORS policy must allow the
+deployed Static Web App origin. Manual runs are available through **Actions →
+Frontend → Run workflow**; deployment still occurs only when the run targets `main`.

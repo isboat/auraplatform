@@ -1,0 +1,80 @@
+name: Management Dashboard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "dashboard/**"
+      - ".github/workflows/dashboard.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "dashboard/**"
+      - ".github/workflows/dashboard.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dashboard-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  PROJECT_PATH: dashboard/Aura.Dashboard/Aura.Dashboard.csproj
+  TEST_PROJECT_PATH: dashboard/Aura.Dashboard.Tests/Aura.Dashboard.Tests.csproj
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
+          cache-dependency-path: "**/*.csproj"
+      - name: Restore
+        run: dotnet restore "${PROJECT_PATH}"
+      - name: Build
+        run: dotnet build "${PROJECT_PATH}" --configuration Release --no-restore
+      - name: Publish
+        run: dotnet publish "${PROJECT_PATH}" --configuration Release --no-restore --output publish
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dashboard
+          path: publish
+          if-no-files-found: error
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
+          cache-dependency-path: "**/*.csproj"
+      - name: Test
+        run: dotnet test "${TEST_PROJECT_PATH}" --configuration Release
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    environment:
+      name: dashboard-production
+      url: ${{ steps.deploy.outputs.webapp-url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dashboard
+          path: publish
+      - name: Deploy to Azure Web App
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_DASHBOARD_APP_NAME }}
+          publish-profile: ${{ secrets.AZURE_DASHBOARD_PUBLISH_PROFILE }}
+          package: publish
