@@ -65,9 +65,15 @@ public sealed class MongoMediaRepository(MongoContext context) : IMediaRepositor
 public sealed class MongoUserRepository(MongoContext context) : IUserRepository
 {
     public Task<StaffUser?> FindAsync(string id)=>context.StaffUsers.Find(x=>x.Id==id).FirstOrDefaultAsync(); public Task<StaffUser?> FindByEmailAsync(string email)=>context.StaffUsers.Find(x=>x.Email==email.ToLowerInvariant()).FirstOrDefaultAsync();
-    public Task<bool> HasAdministratorAsync() => context.StaffUsers
-        .Find(user => user.IsAdministrator || user.Roles.Contains(Roles.Administrator))
-        .AnyAsync();
+    public async Task<bool> HasAdministratorAsync()
+    {
+        var filter = Builders<StaffUser>.Filter.Or(
+            Builders<StaffUser>.Filter.Eq(user => user.IsAdministrator, true),
+            Builders<StaffUser>.Filter.AnyEq(user => user.Roles, Roles.Administrator));
+        return await context.StaffUsers.CountDocumentsAsync(
+            filter,
+            new CountOptions { Limit = 1 }) > 0;
+    }
     public async Task<bool> TryAcquireFirstAdministratorBootstrapAsync()
     {
         try

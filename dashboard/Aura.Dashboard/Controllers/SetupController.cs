@@ -2,6 +2,7 @@ using Aura.Dashboard.Domain;
 using Aura.Dashboard.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Aura.Dashboard.Controllers;
 
@@ -18,7 +19,7 @@ public sealed class SetupController(IStaffBootstrapService bootstrap) : Controll
         return View(new FirstAdministratorRequest());
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken, EnableRateLimiting("first-admin-setup")]
     public async Task<IActionResult> Index(FirstAdministratorRequest request)
     {
         if (!await bootstrap.IsAvailableAsync())
