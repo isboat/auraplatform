@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/backend/">
+    <Project Path="backend/Aura.Api.Tests/Aura.Api.Tests.csproj" />
+    <Project Path="backend/Aura.Api/Aura.Api.csproj" />
+  </Folder>
+</Solution>
