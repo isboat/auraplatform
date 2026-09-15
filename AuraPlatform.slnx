@@ -3,4 +3,8 @@
     <Project Path="backend/Aura.Api.Tests/Aura.Api.Tests.csproj" />
     <Project Path="backend/Aura.Api/Aura.Api.csproj" />
   </Folder>
+  <Folder Name="/dashboard/">
+    <Project Path="dashboard/Aura.Dashboard/Aura.Dashboard.csproj" />
+    <Project Path="dashboard/Aura.Dashboard.Tests/Aura.Dashboard.Tests.csproj" />
+  </Folder>
 </Solution>

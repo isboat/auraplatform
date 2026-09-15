@@ -1,0 +1,14 @@
+@model Aura.Dashboard.Services.CreateStaffUserRequest
+@{ViewData["Title"]="Invite staff member";}
+<a class="back" asp-action="Index">← Back to people</a>
+<section class="panel user-card">
+    <span class="eyebrow">SECURE INVITATION</span><h2>Add management access</h2>
+    <p>The recipient verifies their email and chooses their own password. Administrators can never see it.</p>
+    <form method="post">
+        <div asp-validation-summary="All" class="error"></div>
+        <label asp-for="Name"></label><input asp-for="Name" required>
+        <label asp-for="Email"></label><input asp-for="Email" type="email" required>
+        <label asp-for="Role"></label><select asp-for="Role" required><option value="">Select access</option><option value="ContentReviewer">Content Reviewer</option><option value="Administrator">Administrator</option></select>
+        <button type="submit" onclick="return confirm('Send this management invitation?')">Send secure invitation</button>
+    </form>
+</section>

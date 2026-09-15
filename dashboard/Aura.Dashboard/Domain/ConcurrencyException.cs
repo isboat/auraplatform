@@ -1,0 +1,3 @@
+namespace Aura.Dashboard.Domain;
+
+public sealed class ConcurrencyException(string message) : Exception(message);
