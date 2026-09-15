@@ -1,0 +1,38 @@
+@model Aura.Dashboard.Services.FirstAdministratorRequest
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="~/css/site.css">
+    <title>Create first administrator · Aura Control</title>
+</head>
+<body class="login">
+<main>
+    <div class="login-brand">AURA <span>CONTROL</span></div>
+    <section class="login-card">
+        <span class="eyebrow">ONE-TIME SETUP</span>
+        <h1>Create the first administrator.</h1>
+        <p>This page is permanently disabled after an administrator exists.</p>
+        <form method="post">
+            <div asp-validation-summary="All" class="error"></div>
+            <label asp-for="Name"></label>
+            <input asp-for="Name" autocomplete="name">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" autocomplete="username">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" autocomplete="new-password">
+            <small>At least 12 characters with uppercase, lowercase, a number, and a symbol.</small>
+            <label asp-for="ConfirmPassword">Confirm password</label>
+            <input asp-for="ConfirmPassword" autocomplete="new-password">
+            <label asp-for="SetupToken">Setup token</label>
+            <input asp-for="SetupToken" autocomplete="off">
+            <button type="submit">Create administrator →</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

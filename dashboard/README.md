@@ -14,6 +14,21 @@ Dashboard identities are stored in the dedicated MongoDB `staffuser` collection,
 the public API's `users` collection. At application startup the dashboard ensures the
 collection exists by creating a unique email index and a management state/roles index.
 
+## Create the first administrator
+
+Set a long, random one-time token through environment configuration and start the
+dashboard:
+
+```sh
+export Bootstrap__Token="$(openssl rand -base64 32)"
+dotnet run --project dashboard/Aura.Dashboard
+```
+
+Open `/Setup`, enter the token and create the initial administrator. The endpoint
+returns `404 Not Found` when the token is not configured or after any administrator
+exists. Remove `Bootstrap__Token` from the environment immediately after setup. The
+token and password are never written to the audit log.
+
 ## Test and coverage
 
 ```sh
