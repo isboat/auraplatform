@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace Aura.Dashboard.Controllers;
-public sealed record LoginModel(string Email,string Password);
 public sealed class AccountController(IUserRepository users):Controller
 {
     [AllowAnonymous,HttpGet] public IActionResult Login()=>View(new LoginModel("",""));

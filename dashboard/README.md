@@ -2,6 +2,10 @@
 
 The dashboard is an isolated ASP.NET Core MVC staff application implementing the workflows in `doc/management-dashboard.md`.
 
+Each C# type has its own source file. Keep new domain models, interfaces,
+repositories, services, controllers, and view models separated in the same way so
+individual responsibilities remain easy to navigate and review.
+
 ## Run
 
 1. Install the .NET 10 SDK and start MongoDB.
