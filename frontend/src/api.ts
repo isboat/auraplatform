@@ -52,6 +52,8 @@ export const api = {
   updateConfiguration: (value: Pick<PlatformConfiguration, 'registrationEnabled' | 'uploadsEnabled'>) => request<PlatformConfiguration>('/configuration', { method: 'PUT', body: JSON.stringify(value) }),
   register: (name: string, email: string, password: string) => request<MessageResponse>('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) }),
   login: (email: string, password: string) => request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  forgotPassword: (email: string) => request<MessageResponse>('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (token: string, password: string, confirmPassword: string) => request<MessageResponse>('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password, confirmPassword }) }),
   home: () => request<HomepageMedia>('/media/home'),
   search: (tag: string) => request<Media[]>(`/media/search?tag=${encodeURIComponent(tag)}`),
   media: (id: string) => request<Media>(`/media/${encodeURIComponent(id)}`),

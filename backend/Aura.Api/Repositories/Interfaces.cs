@@ -9,6 +9,9 @@ public interface IUserRepository
     Task<bool> EmailExistsAsync(string email);
     Task AddAsync(UserDocument user);
     Task<bool> VerifyAsync(string token);
+    Task SetPasswordResetTokenAsync(string userId, string tokenHash, DateTime expiresAt);
+    Task<bool> ResetPasswordAsync(string tokenHash, DateTime now, string passwordHash);
+    Task<bool> IsSessionValidAsync(string userId, int sessionVersion);
 }
 
 public interface IMediaRepository

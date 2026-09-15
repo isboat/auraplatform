@@ -12,6 +12,9 @@ public sealed class UserDocument
     public bool EmailVerified { get; set; }
     public string VerificationToken { get; set; } = Guid.NewGuid().ToString("N");
     public bool IsAdministrator { get; set; }
+    public string? PasswordResetTokenHash { get; set; }
+    public DateTime? PasswordResetTokenExpiresAt { get; set; }
+    public int SessionVersion { get; set; }
 }
 
 public sealed class MediaDocument

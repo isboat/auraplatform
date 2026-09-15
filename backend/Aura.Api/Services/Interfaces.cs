@@ -18,6 +18,8 @@ public interface IAuthService
     Task<MessageResponse> RegisterAsync(RegisterRequest request, string verificationBaseUrl);
     Task<MessageResponse> VerifyAsync(string token);
     Task<AuthResponse> LoginAsync(LoginRequest request);
+    Task<MessageResponse> ForgotPasswordAsync(ForgotPasswordRequest request, string resetBaseUrl);
+    Task<MessageResponse> ResetPasswordAsync(ResetPasswordRequest request);
 }
 public interface IConfigurationService { Task<PlatformConfiguration> GetAsync(); Task<PlatformConfiguration> UpdateAsync(ConfigurationRequest request); }
 public interface IMediaService

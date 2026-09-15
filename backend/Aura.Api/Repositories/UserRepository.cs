@@ -15,4 +15,24 @@ public sealed class UserRepository(MongoContext db) : IUserRepository
         var result = await db.Users.UpdateOneAsync(x => x.VerificationToken == token, Builders<UserDocument>.Update.Set(x => x.EmailVerified, true).Set(x => x.VerificationToken, ""));
         return result.ModifiedCount == 1;
     }
+
+    public Task SetPasswordResetTokenAsync(string userId, string tokenHash, DateTime expiresAt) =>
+        db.Users.UpdateOneAsync(x => x.Id == userId, Builders<UserDocument>.Update
+            .Set(x => x.PasswordResetTokenHash, tokenHash)
+            .Set(x => x.PasswordResetTokenExpiresAt, expiresAt));
+
+    public async Task<bool> ResetPasswordAsync(string tokenHash, DateTime now, string passwordHash)
+    {
+        var result = await db.Users.UpdateOneAsync(
+            x => x.PasswordResetTokenHash == tokenHash && x.PasswordResetTokenExpiresAt > now,
+            Builders<UserDocument>.Update
+                .Set(x => x.PasswordHash, passwordHash)
+                .Set(x => x.PasswordResetTokenHash, null)
+                .Set(x => x.PasswordResetTokenExpiresAt, null)
+                .Inc(x => x.SessionVersion, 1));
+        return result.ModifiedCount == 1;
+    }
+
+    public Task<bool> IsSessionValidAsync(string userId, int sessionVersion) =>
+        db.Users.Find(x => x.Id == userId && x.SessionVersion == sessionVersion).AnyAsync();
 }

@@ -117,3 +117,62 @@ test('upload page immediately shows progress while an upload starts', async ({ p
   await expect(page.getByRole('progressbar', { name: 'Media upload progress' })).toHaveAttribute('aria-valuenow', '0');
   await expect(page.getByText('Please keep this page open while your media is being uploaded.')).toBeVisible();
 });
+
+test('password reset request uses a privacy-preserving confirmation', async ({ page }) => {
+  await page.unroute('http://localhost:5080/api/**');
+  await page.route('http://localhost:5080/api/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === '/api/configuration') return route.fulfill({ json: { id: 'platform', registrationEnabled: true, uploadsEnabled: true } });
+    return route.fulfill({ status: 202, json: { message: 'If an account exists for that verified email address, a password reset link has been sent.' } });
+  });
+
+  await page.goto('/signin', { waitUntil: 'domcontentloaded' });
+  await page.getByRole('link', { name: 'Forgot your password?' }).click();
+  await page.getByLabel('Email address').fill('person@example.com');
+  await page.getByRole('button', { name: 'Send reset link' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
+  await expect(page.getByText('If an account exists for that verified email address')).toBeVisible();
+});
+
+test('password reset link lets a user choose and confirm a new password', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('aura-user', JSON.stringify({ id: 'user', name: 'Jamie', email: 'jamie@example.com', isAdministrator: false }));
+    localStorage.setItem('aura-token', 'old-session-token');
+  });
+  await page.unroute('http://localhost:5080/api/**');
+  await page.route('http://localhost:5080/api/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === '/api/configuration') return route.fulfill({ json: { id: 'platform', registrationEnabled: true, uploadsEnabled: true } });
+    expect(route.request().postDataJSON()).toEqual({ token: 'one-time-token', password: 'new-password', confirmPassword: 'new-password' });
+    return route.fulfill({ json: { message: 'Your password has been reset. Sign in with your new password.' } });
+  });
+
+  await page.goto('/reset-password?token=one-time-token', { waitUntil: 'domcontentloaded' });
+  await page.getByLabel('New password', { exact: true }).fill('new-password');
+  await page.getByLabel('Confirm new password').fill('new-password');
+  await page.getByRole('button', { name: 'Reset password' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Password reset' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Continue to sign in' })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('aura-token'))).toBeNull();
+});
+
+test('password reset catches mismatched confirmation before calling the API', async ({ page }) => {
+  let resetCalls = 0;
+  await page.unroute('http://localhost:5080/api/**');
+  await page.route('http://localhost:5080/api/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === '/api/configuration') return route.fulfill({ json: { id: 'platform', registrationEnabled: true, uploadsEnabled: true } });
+    resetCalls += 1;
+    return route.fulfill({ json: { message: 'Unexpected request.' } });
+  });
+
+  await page.goto('/reset-password?token=one-time-token', { waitUntil: 'domcontentloaded' });
+  await page.getByLabel('New password', { exact: true }).fill('new-password');
+  await page.getByLabel('Confirm new password').fill('different-password');
+  await page.getByRole('button', { name: 'Reset password' }).click();
+
+  await expect(page.getByRole('alert')).toHaveText('Passwords do not match.');
+  expect(resetCalls).toBe(0);
+});
