@@ -53,3 +53,30 @@ test('backend failures display a dismissible UI message', async ({ page }) => {
   await page.getByRole('button', { name: 'Dismiss error' }).click();
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
+
+test('upload page immediately shows progress while an upload starts', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('aura-user', JSON.stringify({ id: 'user', name: 'Jamie', email: 'jamie@example.com', isAdministrator: false }));
+    localStorage.setItem('aura-token', 'test-token');
+  });
+  await page.unroute('http://localhost:5080/api/**');
+  await page.route('http://localhost:5080/api/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === '/api/configuration') return route.fulfill({ json: { id: 'platform', registrationEnabled: true, uploadsEnabled: true } });
+    if (path === '/api/media/uploads') {
+      await new Promise(resolve => setTimeout(resolve, 1_000));
+      return route.fulfill({ json: { mediaId: 'media', uploadId: 'upload', partUrls: [] } });
+    }
+    return route.fulfill({ json: { message: 'Upload complete.' } });
+  });
+
+  await page.goto('/upload', { waitUntil: 'domcontentloaded' });
+  await page.locator('input[type="file"]').setInputFiles('tests/fixtures/sample.mp4');
+  await page.getByRole('button', { name: 'Upload for review' }).click();
+
+  const uploadButton = page.getByRole('button', { name: 'Preparing upload…' });
+  await expect(uploadButton).toBeDisabled();
+  await expect(uploadButton.locator('.upload-spinner')).toBeVisible();
+  await expect(page.getByRole('progressbar', { name: 'Media upload progress' })).toHaveAttribute('aria-valuenow', '0');
+  await expect(page.getByText('Please keep this page open while your media is being uploaded.')).toBeVisible();
+});
