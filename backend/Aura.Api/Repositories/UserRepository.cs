@@ -34,5 +34,21 @@ public sealed class UserRepository(MongoContext db) : IUserRepository
     }
 
     public Task<bool> IsSessionValidAsync(string userId, int sessionVersion) =>
-        db.Users.Find(x => x.Id == userId && x.SessionVersion == sessionVersion).AnyAsync();
+        db.Users.Find(BuildSessionFilter(userId, sessionVersion)).AnyAsync();
+
+    internal static FilterDefinition<UserDocument> BuildSessionFilter(string userId, int sessionVersion)
+    {
+        var filters = Builders<UserDocument>.Filter;
+        var versionFilter = filters.Eq(user => user.SessionVersion, sessionVersion);
+
+        // SessionVersion was added after accounts already existed. MongoDB does not
+        // consider a missing numeric field equal to zero, although deserialization
+        // correctly gives those legacy accounts the CLR default value of zero.
+        if (sessionVersion == 0)
+            versionFilter = filters.Or(
+                versionFilter,
+                filters.Exists(user => user.SessionVersion, false));
+
+        return filters.And(filters.Eq(user => user.Id, userId), versionFilter);
+    }
 }
