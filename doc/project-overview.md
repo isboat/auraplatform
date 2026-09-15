@@ -60,6 +60,12 @@ Users can create an account by completing a registration form with:
 
 After registration, the platform sends a verification email containing a link to the email verification page. The user follows the link to verify their email address, and successful verification completes the account setup.
 
+Each user account contains a name, an email address used as the unique username, and a securely hashed password. Signed-in users can edit their own name without changing their username.
+
+## Password Reset
+
+Users who forget their password can request a reset from the sign-in experience by entering their email address. The platform sends a one-time, time-limited link to the verified email address. The link opens a reset page where the user chooses and confirms a new password. Responses to reset requests must not reveal whether an email address is registered, and successful password changes invalidate the reset token and existing sessions as soon as practical.
+
 ## Sign In and Authentication
 
 The platform provides a sign-in page where users enter:

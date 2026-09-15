@@ -50,6 +50,7 @@ An Administrator has all Content Reviewer permissions and can also:
 
 - View and search user accounts.
 - Edit permitted user-account details.
+- Add Content Reviewers and manage reviewer access.
 - Delete or block a user account.
 - Unblock a blocked user account.
 - Initiate a secure password reset for a user.
@@ -69,6 +70,7 @@ An Administrator has all Content Reviewer permissions and can also:
 | View moderation audit history | Yes | Yes |
 | View and search users | No | Yes |
 | Edit users | No | Yes |
+| Add or remove Content Reviewers | No | Yes |
 | Block, unblock, or delete users | No | Yes |
 | Initiate password resets | No | Yes |
 | Delete media | No | Yes |
@@ -167,6 +169,16 @@ Rejection reasons may be shown to the uploader where product policy permits, but
 
 User management is restricted to Administrators.
 
+### User Account Fields
+
+Every platform user has:
+
+- A name.
+- A unique email address, which is also the username used to sign in.
+- A password stored only as a secure password hash.
+
+Passwords and password hashes must never be shown in user lists, details, edit forms, logs, or audit records.
+
 ### User List and Details
 
 Administrators can view and search users by name, email, verification state, account state, or role. The user details page should show:
@@ -181,7 +193,22 @@ Administrators can view and search users by name, email, verification state, acc
 
 ### Edit User
 
-Administrators can edit explicitly permitted profile or role fields. Changes require validation, confirmation for privilege changes, and an audit record containing the changed fields without recording sensitive values.
+Administrators can edit explicitly permitted profile or role fields, including a user's name. Email or username changes require uniqueness validation and re-verification according to platform security policy. Changes require validation, confirmation for privilege changes, and an audit record containing the changed fields without recording sensitive values.
+
+### Add and Manage Content Reviewers
+
+Administrators can grant the Content Reviewer role to an active, verified user account. They can search for an existing user and confirm the role assignment, or invite a new reviewer by entering the reviewer's name and unique email address. An invited reviewer receives a one-time, time-limited link to verify the email address and choose a password; administrators do not choose or see that password.
+
+Before granting reviewer access, the service must verify that:
+
+- The acting account is an Administrator.
+- The target email address is unique.
+- The target account is verified, active, and not blocked before dashboard access is allowed.
+- The target does not already have the Content Reviewer or Administrator role.
+
+Administrators can remove the Content Reviewer role when access is no longer needed. Removing the role must invalidate or reject the reviewer's active management session as soon as practical without deleting the underlying platform account.
+
+Adding, inviting, or removing a reviewer must create an audit event containing the administrator, target user, previous roles, new roles, date and time, and outcome. Invitation and password-setup tokens must never appear in the audit log.
 
 ### Block and Unblock User
 
@@ -194,6 +221,12 @@ Deleting an account is a destructive operation requiring confirmation. The imple
 ### Reset Password
 
 Administrators initiate a password reset rather than choosing or viewing a user's password. The platform sends the user a one-time, expiring reset link and records that the reset was requested. Reset tokens and passwords must never be written to the audit log.
+
+Users can also initiate their own password reset from the platform sign-in page by entering their email username. The response must be the same whether or not the account exists. If an active, verified account matches, the platform sends a one-time, time-limited reset link. The user chooses and confirms a new password on the reset page, after which the token becomes unusable and existing sessions are invalidated as soon as practical.
+
+### Self-Service Profile
+
+Signed-in users can edit their own name from an account or profile page. Name changes require validation and do not change the email username. A user cannot assign roles, unblock an account, or edit protected account fields through this page.
 
 ## Media Management
 
@@ -215,7 +248,7 @@ The audit log provides an accountable history of moderation and administrative a
 Each audit entry should include:
 
 - A unique audit-event identifier.
-- Event type, such as `MediaApproved`, `MediaRejected`, `MediaDeleted`, `UserEdited`, `UserBlocked`, `UserUnblocked`, `UserDeleted`, or `PasswordResetRequested`.
+- Event type, such as `MediaApproved`, `MediaRejected`, `MediaDeleted`, `UserEdited`, `UserBlocked`, `UserUnblocked`, `UserDeleted`, `ReviewerInvited`, `ReviewerAdded`, `ReviewerRemoved`, or `PasswordResetRequested`.
 - UTC date and time.
 - Staff actor identifier, name, email, and role at the time of the action.
 - Target type and stable target identifier.
@@ -254,7 +287,7 @@ Audit records must never contain passwords, password hashes, reset tokens, JWTs,
 - `Account` — staff sign-in, sign-out, and access-denied pages.
 - `Dashboard` — platform and review summary.
 - `Reviews` — review queue, media preview, approval, rejection, and review history.
-- `Users` — administrator-only user search, details, edit, block, delete, and password reset.
+- `Users` — administrator-only user search, details, edit, reviewer access, block, delete, and password reset.
 - `Media` — administrator-only media search, details, and deletion.
 - `Audit` — role-filtered audit history and event details.
 
@@ -266,7 +299,7 @@ The management application should include:
 - Authorization tests proving that Content Reviewers cannot access Administrator actions.
 - Controller tests for validation, anti-forgery behavior, redirects, and status messages.
 - Repository integration tests for atomic review decisions and audit persistence.
-- End-to-end tests for sign-in, approve, reject-with-reason, user blocking, password-reset initiation, media deletion, metrics, and audit filtering.
+- End-to-end tests for sign-in, approve, reject-with-reason, adding and removing reviewers, self-service name editing, user blocking, user password resets, media deletion, metrics, and audit filtering.
 - Tests confirming that concurrent reviewers cannot overwrite an existing decision.
 - Tests confirming that sensitive credentials and tokens never appear in audit records.
 
@@ -279,6 +312,8 @@ The management dashboard is ready for release when:
 - A rejection cannot be submitted without a reason.
 - Every moderation and administrator action produces an audit event.
 - Administrators can view, edit, block, unblock, delete, and initiate password resets for user accounts.
+- Administrators can invite or assign Content Reviewers and remove reviewer access.
+- Users can edit their own name and complete a secure password-reset flow using their email username.
 - Administrators can delete media through the configured storage abstraction.
 - Administrators can see user totals and media totals by type and review status.
 - Server-side authorization prevents Content Reviewers from using Administrator-only operations.
