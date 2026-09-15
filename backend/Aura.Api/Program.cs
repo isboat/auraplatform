@@ -26,6 +26,8 @@ builder.Services.AddSingleton<IMediaService, MediaService>();
 builder.Services.AddSingleton<IUploadService, UploadService>();
 builder.Services.AddSingleton<ICommentService, CommentService>();
 builder.Services.AddControllers(options => options.Filters.Add<ServiceExceptionFilter>());
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins(builder.Configuration["FrontendUrl"] ?? "http://localhost:5173")));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -43,6 +45,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

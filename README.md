@@ -30,6 +30,8 @@ dotnet run
 
 The API runs at `http://localhost:5080` under the included development launch profile. Replace the development JWT key before deployment and provide AWS credentials through the standard AWS credential chain.
 
+When the API runs in the Development environment, interactive Swagger documentation is available at `http://localhost:5080/swagger`. The underlying OpenAPI document is available at `http://localhost:5080/swagger/v1/swagger.json`.
+
 ### Backend architecture
 
 The API follows a controller → service → repository structure:
