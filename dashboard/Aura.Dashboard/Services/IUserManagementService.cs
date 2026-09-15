@@ -5,6 +5,7 @@ namespace Aura.Dashboard.Services;
 
 public interface IUserManagementService
 {
+    Task<StaffUser> InviteAsync(CreateStaffUserRequest request, StaffActor actor);
     Task SetBlockedAsync(string id, bool blocked, string reason, StaffActor actor);
     Task SetReviewerAsync(string id, bool enabled, StaffActor actor);
     Task PromoteAdministratorAsync(string id, StaffActor actor);

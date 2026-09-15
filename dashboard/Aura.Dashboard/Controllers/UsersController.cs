@@ -2,6 +2,8 @@ using Aura.Dashboard.Domain;using Aura.Dashboard.Repositories;using Aura.Dashboa
 namespace Aura.Dashboard.Controllers;
 [Authorize(Roles=Roles.Administrator)] public sealed class UsersController(IUserRepository users,IUserManagementService service):ManagementController
 {public async Task<IActionResult> Index(string? query,string? role,bool? blocked,int page=1)=>View(await users.SearchAsync(query,role,blocked,Math.Max(page,1),20));public async Task<IActionResult> Details(string id){var u=await users.FindAsync(id);return u is null?NotFound():View(u);}
+[HttpGet]public IActionResult Create()=>View(new CreateStaffUserRequest());
+[HttpPost,ValidateAntiForgeryToken]public async Task<IActionResult> Create(CreateStaffUserRequest request){if(!ModelState.IsValid)return View(request);try{await service.InviteAsync(request,Actor());return Success("Invitation sent. Access begins after verification and password setup.",nameof(Index));}catch(DashboardRuleException e){ModelState.AddModelError(string.Empty,e.Message);return View(request);}}
 [HttpPost,ValidateAntiForgeryToken]public Task<IActionResult> Block(string id,bool blocked,string reason)=>Run(()=>service.SetBlockedAsync(id,blocked,reason,Actor()),blocked?"User blocked.":"User unblocked.");
 [HttpPost,ValidateAntiForgeryToken]public Task<IActionResult> Reviewer(string id,bool enabled)=>Run(()=>service.SetReviewerAsync(id,enabled,Actor()),"Reviewer access updated.");
 [HttpPost,ValidateAntiForgeryToken]public Task<IActionResult> Promote(string id)=>Run(()=>service.PromoteAdministratorAsync(id,Actor()),"Administrator access granted.");

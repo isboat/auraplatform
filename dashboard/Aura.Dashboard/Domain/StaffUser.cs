@@ -16,6 +16,10 @@ public sealed class StaffUser
     public List<string> Roles { get; set; } = [];
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int SessionVersion { get; set; }
+    public string? InvitationTokenHash { get; set; }
+    public DateTime? InvitationExpiresAtUtc { get; set; }
+    public string? PasswordResetTokenHash { get; set; }
+    public DateTime? PasswordResetExpiresAtUtc { get; set; }
     [BsonIgnore] public bool IsAdmin => IsAdministrator || Roles.Contains(Domain.Roles.Administrator);
     [BsonIgnore] public bool IsReviewer => IsAdmin || Roles.Contains(Domain.Roles.Reviewer);
 }
