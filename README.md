@@ -4,8 +4,8 @@ Aura is a responsive media-hosting platform for videos, images, and audio. It in
 
 ## Projects
 
-- `backend/Aura.Api` — .NET 10 ASP.NET Core minimal API backed by MongoDB and Amazon S3.
-- `frontend` — TypeScript, React, and Vite single-page frontend connected to the backend API.
+- [`backend/Aura.Api`](backend/README.md) — .NET 10 ASP.NET Core controller API backed by MongoDB and configurable Amazon S3 or Azure Blob Storage.
+- [`frontend`](frontend/README.md) — TypeScript, React, and Vite single-page frontend connected to the backend API.
 - `doc/project-overview.md` — product and architecture requirements.
 
 ## Frontend
@@ -18,6 +18,8 @@ npm run dev
 
 The frontend runs at `http://localhost:5173`. Set `VITE_API_URL` when the API is not available at the default `http://localhost:5080/api` address. The frontend reads media, authentication, configuration, upload, reaction, and comment data from the API; it does not ship demo media.
 
+See the [frontend README](frontend/README.md) for environment configuration, available scripts, application structure, upload behavior, and browser-test guidance.
+
 ## Backend
 
 Configure MongoDB, JWT, and the selected media-storage provider, then run:
@@ -28,7 +30,9 @@ dotnet restore
 dotnet run
 ```
 
-The API runs at `http://localhost:5080` under the included development launch profile. Replace the development JWT key before deployment and provide AWS credentials through the standard AWS credential chain.
+The API runs at `http://localhost:5080` under the included development launch profile. Replace the development JWT key before deployment and configure credentials for the selected media-storage provider.
+
+See the [backend README](backend/README.md) for complete configuration, API routes, authentication, architecture, storage-provider setup, health checks, and test guidance.
 
 ### Media storage provider
 
