@@ -5,11 +5,13 @@ using Aura.Api.Common;
 using Aura.Api.Repositories;
 using Aura.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<MongoContext>();
+builder.Services.AddSingleton<IMongoHealthProbe>(services => services.GetRequiredService<MongoContext>());
 builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(RegionEndpoint.GetBySystemName(builder.Configuration["AWS:Region"] ?? "us-east-1")));
 builder.Services.AddSingleton<IMediaStorage, MediaStorage>();
 builder.Services.AddSingleton<IEmailService, LoggingEmailService>();
@@ -28,6 +30,9 @@ builder.Services.AddSingleton<ICommentService, CommentService>();
 builder.Services.AddControllers(options => options.Filters.Add<ServiceExceptionFilter>());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHealthChecks()
+    .AddCheck<MongoDbHealthCheck>("mongodb", tags: ["database"])
+    .AddCheck<S3HealthCheck>("s3", tags: ["storage"]);
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins(builder.Configuration["FrontendUrl"] ?? "http://localhost:5173")));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -55,7 +60,26 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            status = report.Status.ToString(),
+            duration = report.TotalDuration,
+            services = report.Entries.ToDictionary(
+                entry => entry.Key,
+                entry => new
+                {
+                    status = entry.Value.Status.ToString(),
+                    description = entry.Value.Description,
+                    duration = entry.Value.Duration
+                })
+        }, context.RequestAborted);
+    }
+});
 app.Run();
 
 public partial class Program;

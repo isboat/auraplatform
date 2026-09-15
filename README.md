@@ -32,6 +32,8 @@ The API runs at `http://localhost:5080` under the included development launch pr
 
 When the API runs in the Development environment, interactive Swagger documentation is available at `http://localhost:5080/swagger`. The underlying OpenAPI document is available at `http://localhost:5080/swagger/v1/swagger.json`.
 
+The `GET /health` endpoint checks both MongoDB and the configured Amazon S3 bucket. It returns an overall status together with the status, description, and response duration of each dependency, and responds with an unhealthy HTTP status when either dependency cannot be reached.
+
 ### Backend architecture
 
 The API follows a controller → service → repository structure:
