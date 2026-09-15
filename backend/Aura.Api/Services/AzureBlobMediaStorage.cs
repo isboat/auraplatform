@@ -94,9 +94,15 @@ internal static class AzureBlobClientExtensions
             return blob.GenerateSasUri(permissions, expiresAt);
         }
 
-        var sas = !string.IsNullOrWhiteSpace(configuredSas)
-            ? configuredSas
-            : blob.Uri.Query;
+        // A client created from a SAS connection string already includes that SAS
+        // in its resource URI. Appending the configured value again duplicates
+        // signed fields (sv, sig, se, and others), invalidating the signature.
+        if (ContainsSasSignature(blob.Uri.Query))
+        {
+            return blob.Uri;
+        }
+
+        var sas = configuredSas;
         if (string.IsNullOrWhiteSpace(sas))
         {
             throw new InvalidOperationException(
@@ -104,16 +110,11 @@ internal static class AzureBlobClientExtensions
         }
 
         var builder = new UriBuilder(blob.Uri);
-        builder.Query = MergeQuery(builder.Query, sas);
+        builder.Query = sas.Trim().TrimStart('?');
         return builder.Uri;
     }
 
-    private static string MergeQuery(string first, string second)
-    {
-        var values = new[] { first, second }
-            .Select(value => value.Trim().TrimStart('?'))
-            .Where(value => value.Length > 0)
-            .Distinct(StringComparer.Ordinal);
-        return string.Join('&', values);
-    }
+    private static bool ContainsSasSignature(string query) =>
+        query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Any(part => part.StartsWith("sig=", StringComparison.OrdinalIgnoreCase));
 }

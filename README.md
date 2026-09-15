@@ -46,7 +46,7 @@ AzureStorage__ConnectionString='DefaultEndpointsProtocol=...'
 AzureStorage__ContainerName=aura-media
 ```
 
-Azure uploads use blocks with authorized URLs, allowing large media to continue using the frontend's chunked upload flow. A connection string containing an `AccountKey` generates short-lived SAS URLs. A connection string containing `SharedAccessSignature` reuses that service SAS because Azure cannot generate another SAS without a shared key; ensure it grants create, write, read, and delete permissions and choose its expiration carefully. The API now reports a clear configuration error if neither credential is available instead of raising `sharedKeyCredential` as a null argument.
+Azure uploads use blocks with authorized URLs, allowing large media to continue using the frontend's chunked upload flow. A connection string containing an `AccountKey` generates short-lived SAS URLs. A connection string containing `SharedAccessSignature` reuses the SAS already present in each Blob client URL because Azure cannot generate another SAS without a shared key; ensure it grants create, write, read, and delete permissions and choose its expiration carefully. The API never appends that SAS a second time, because duplicated signed query parameters invalidate the Azure signature. It reports a clear configuration error if neither credential is available instead of raising `sharedKeyCredential` as a null argument.
 
 The Azure Storage account must also allow browser CORS requests from the frontend origin and expose the `PUT` method and `ETag` response header. The configured credentials must be able to create the container, stage and commit blocks, read blobs, and delete blobs.
 
