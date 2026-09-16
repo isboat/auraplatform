@@ -1,6 +1,7 @@
 name: Management Dashboard
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
