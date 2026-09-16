@@ -10,7 +10,7 @@ public sealed class FirstAdministratorRequest
     [Required, EmailAddress, StringLength(254)]
     public string Email { get; init; } = string.Empty;
 
-    [Required, StringLength(128, MinimumLength = 12)]
+    [Required, StringLength(128, MinimumLength = 6)]
     [DataType(DataType.Password)]
     public string Password { get; init; } = string.Empty;
 
