@@ -12,7 +12,6 @@ on:
     paths:
       - "frontend/**"
       - ".github/workflows/frontend.yml"
-  workflow_dispatch:
 
 permissions:
   contents: read

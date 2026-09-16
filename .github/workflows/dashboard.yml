@@ -12,7 +12,6 @@ on:
     paths:
       - "dashboard/**"
       - ".github/workflows/dashboard.yml"
-  workflow_dispatch:
 
 permissions:
   contents: read
