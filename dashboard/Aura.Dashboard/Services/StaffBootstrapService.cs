@@ -21,7 +21,6 @@ public sealed class StaffBootstrapService(
             throw new DashboardRuleException("The first administrator has already been created.");
 
         ValidateSetupToken(request.SetupToken);
-        ValidatePassword(request.Password);
         if (!string.Equals(request.Password, request.ConfirmPassword, StringComparison.Ordinal))
             throw new DashboardRuleException("The password and confirmation do not match.");
 
@@ -88,16 +87,5 @@ public sealed class StaffBootstrapService(
         var expectedHash = SHA256.HashData(Encoding.UTF8.GetBytes(expected));
         var suppliedHash = SHA256.HashData(Encoding.UTF8.GetBytes(supplied));
         return CryptographicOperations.FixedTimeEquals(expectedHash, suppliedHash);
-    }
-
-    private static void ValidatePassword(string password)
-    {
-        if (password.Length < 12 ||
-            !password.Any(char.IsUpper) ||
-            !password.Any(char.IsLower) ||
-            !password.Any(char.IsDigit) ||
-            !password.Any(character => !char.IsLetterOrDigit(character)))
-            throw new DashboardRuleException(
-                "Use at least 12 characters with uppercase, lowercase, a number, and a symbol.");
     }
 }
