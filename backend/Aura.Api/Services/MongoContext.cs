@@ -9,10 +9,17 @@ public interface IMongoHealthProbe
     Task PingAsync(CancellationToken cancellationToken);
 }
 
-public sealed class MongoContext(IConfiguration configuration) : IMongoHealthProbe
+public sealed class MongoContext : IMongoHealthProbe
 {
-    private readonly IMongoDatabase _database = new MongoClient(configuration["MongoDb:ConnectionString"])
-        .GetDatabase(configuration["MongoDb:DatabaseName"] ?? "aura");
+    public MongoContext(IConfiguration configuration)
+    {
+        var settings = MongoClientSettings.FromConnectionString(configuration["MongoDb:ConnectionString"] ?? "mongodb://localhost:27017");
+        // Set the ServerApi field of the settings object to set the version of the Stable API on the client
+        settings.ServerApi = new ServerApi(ServerApiVersion.V1);
+
+        _database = new MongoClient(settings).GetDatabase(configuration["MongoDb:DatabaseName"] ?? "aura");
+    }
+    private readonly IMongoDatabase _database;
 
     public IMongoCollection<UserDocument> Users => _database.GetCollection<UserDocument>("users");
     public IMongoCollection<MediaDocument> Media => _database.GetCollection<MediaDocument>("media");
