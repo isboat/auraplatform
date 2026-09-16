@@ -1,6 +1,7 @@
 using Aura.Dashboard.Domain;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
+using Xunit;
 
 namespace Aura.Dashboard.Tests;
 

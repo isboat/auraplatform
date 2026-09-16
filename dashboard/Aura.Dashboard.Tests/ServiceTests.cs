@@ -1,6 +1,8 @@
 using Aura.Dashboard.Domain;using Aura.Dashboard.Repositories;using Aura.Dashboard.Services;using Moq;
 using Microsoft.Extensions.Configuration;
+using Xunit;
 namespace Aura.Dashboard.Tests;
+
 public sealed class ServiceTests
 {
  [Fact]public void Dashboard_users_have_a_dedicated_collection(){Assert.Equal("staffuser",MongoCollectionNames.StaffUsers);}
