@@ -1,6 +1,8 @@
 using Aura.Dashboard.Domain;
 using Aura.Dashboard.Repositories;
 using Aura.Dashboard.Services;
+using Amazon;
+using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Threading.RateLimiting;
 
@@ -8,7 +10,17 @@ var builder=WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<MongoContext>();builder.Services.AddSingleton<IMediaRepository,MongoMediaRepository>();builder.Services.AddSingleton<IUserRepository,MongoUserRepository>();builder.Services.AddSingleton<IAuditRepository,MongoAuditRepository>();
 builder.Services.AddHostedService<MongoSchemaInitializer>();
-builder.Services.AddSingleton<IAssetStorage,ConfiguredAssetStorage>();builder.Services.AddSingleton<IResetDelivery,LoggingResetDelivery>();builder.Services.AddScoped<IModerationService,ModerationService>();builder.Services.AddScoped<IUserManagementService,UserManagementService>();builder.Services.AddScoped<IMediaManagementService,MediaManagementService>();builder.Services.AddScoped<IReportingService,ReportingService>();
+builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(RegionEndpoint.GetBySystemName(builder.Configuration["AWS:Region"] ?? "us-east-1")));
+builder.Services.AddSingleton<IAssetStorage>(services =>
+{
+    var provider = (builder.Configuration["MediaStorage:Provider"] ?? "S3").Trim();
+    return provider.ToUpperInvariant() switch
+    {
+        "S3" => ActivatorUtilities.CreateInstance<S3AssetStorage>(services),
+        "AZURE" => ActivatorUtilities.CreateInstance<AzureBlobAssetStorage>(services),
+        _ => throw new InvalidOperationException($"Unsupported media storage provider '{provider}'. Use 'S3' or 'Azure'.")
+    };
+});builder.Services.AddSingleton<IResetDelivery,LoggingResetDelivery>();builder.Services.AddScoped<IModerationService,ModerationService>();builder.Services.AddScoped<IUserManagementService,UserManagementService>();builder.Services.AddScoped<IMediaManagementService,MediaManagementService>();builder.Services.AddScoped<IReportingService,ReportingService>();
 builder.Services.AddSingleton<IStaffInvitationDelivery, LoggingStaffInvitationDelivery>();
 builder.Services.AddSingleton<ISecureTokenService, SecureTokenService>();
 builder.Services.AddScoped<IStaffBootstrapService, StaffBootstrapService>();

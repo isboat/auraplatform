@@ -9,10 +9,10 @@ individual responsibilities remain easy to navigate and review.
 ## Run
 
 1. Install the .NET 10 SDK and start MongoDB.
-2. Supply `ConnectionStrings__MongoDb`, `Mongo__Database`, and media-storage configuration through environment-specific configuration or a secret store.
+2. Supply `ConnectionStrings__MongoDb`, `Mongo__Database`, and the same media-storage configuration used by the API through environment-specific configuration or a secret store. Set `MediaStorage__Provider` to `S3` with `AWS__Region` and `AWS__BucketName`, or to `Azure` with `AzureStorage__ConnectionString` and `AzureStorage__ContainerName`.
 3. Run `dotnet run --project dashboard/Aura.Dashboard`.
 
-Only verified, active users with `ContentReviewer` or `Administrator` access can authenticate. Production deployments must replace the development storage/reset adapters with adapters for the same provider and mail delivery used by the API.
+Only verified, active users with `ContentReviewer` or `Administrator` access can authenticate. The dashboard generates the same one-hour signed media URLs as the API and deletes assets through the configured provider. Production deployments must replace the development reset adapter with the mail delivery used by the API.
 
 Dashboard identities are stored in the dedicated MongoDB `staffuser` collection, not
 the public API's `users` collection. At application startup the dashboard ensures the
