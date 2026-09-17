@@ -5,13 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Aura.Api.Controllers;
 
 [ApiController, Route("api/auth")]
-public sealed class AuthController(IAuthService auth, IConfiguration configuration) : ControllerBase
+public sealed class AuthController(IAuthService auth, AuthLinkBuilder links) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<ActionResult<MessageResponse>> Register(RegisterRequest request)
     {
-        var verificationUrl = Url.ActionLink(nameof(Verify), values: new { token = "" })?.Split('?')[0] ?? $"{Request.Scheme}://{Request.Host}/api/auth/verify";
-        return Accepted(await auth.RegisterAsync(request, verificationUrl));
+        return Accepted(await auth.RegisterAsync(request, links.VerificationBaseUrl));
     }
 
     [HttpGet("verify")]
@@ -23,8 +22,7 @@ public sealed class AuthController(IAuthService auth, IConfiguration configurati
     [HttpPost("forgot-password")]
     public async Task<ActionResult<MessageResponse>> ForgotPassword(ForgotPasswordRequest request)
     {
-        var frontendUrl = (configuration["FrontendUrl"] ?? "http://localhost:5173").TrimEnd('/');
-        return Accepted(await auth.ForgotPasswordAsync(request, $"{frontendUrl}/reset-password"));
+        return Accepted(await auth.ForgotPasswordAsync(request, links.PasswordResetBaseUrl));
     }
 
     [HttpPost("reset-password")]

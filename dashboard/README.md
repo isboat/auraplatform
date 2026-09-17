@@ -14,6 +14,8 @@ individual responsibilities remain easy to navigate and review.
 
 Only verified, active users with `ContentReviewer` or `Administrator` access can authenticate. The dashboard generates the same one-hour signed media URLs as the API and deletes assets through the configured provider. Staff invitations and password resets are delivered through Yahoo SMTP with TLS; keep the Yahoo app password in an environment setting or secret store and never commit it.
 
+Invitation and reset links open public, rate-limited dashboard forms. Each form validates the one-time token hash and expiry in a single database update, sets the new password, consumes the token, and invalidates existing sessions before redirecting to sign in.
+
 Dashboard identities are stored in the dedicated MongoDB `staffuser` collection, not
 the public API's `users` collection. At application startup the dashboard ensures the
 collection exists by creating a unique email index and a management state/roles index.

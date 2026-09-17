@@ -2,6 +2,7 @@ using Aura.Dashboard.Domain;
 using Aura.Dashboard.Services;
 using Microsoft.Extensions.Options;
 using Moq;
+using Xunit;
 
 namespace Aura.Dashboard.Tests;
 
@@ -43,5 +44,5 @@ public sealed class YahooDeliveryTests
                                   body.Contains("2026-09-18 10:30:00Z"))));
     }
 
-    private static StaffUser User() => new() { Name = "Rita", Email = "reviewer@example.com" };
+    private static StaffUser User() => new() { Name = "Rita", Email = "reviewer@example.com", PasswordHash = string.Empty };
 }

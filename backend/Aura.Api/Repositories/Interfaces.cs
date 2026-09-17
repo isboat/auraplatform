@@ -8,6 +8,7 @@ public interface IUserRepository
     Task<UserDocument?> FindByIdAsync(string id);
     Task<bool> EmailExistsAsync(string email);
     Task AddAsync(UserDocument user);
+    Task DeleteAsync(string id);
     Task<bool> VerifyAsync(string token);
     Task SetPasswordResetTokenAsync(string userId, string tokenHash, DateTime expiresAt);
     Task<bool> ResetPasswordAsync(string tokenHash, DateTime now, string passwordHash);

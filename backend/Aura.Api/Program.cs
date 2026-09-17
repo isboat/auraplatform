@@ -24,6 +24,8 @@ builder.Services.AddSingleton<IMediaStorage>(services =>
     };
 });
 builder.Services.Configure<YahooMailOptions>(builder.Configuration.GetSection(YahooMailOptions.SectionName));
+builder.Services.Configure<AuthLinkOptions>(builder.Configuration.GetSection(AuthLinkOptions.SectionName));
+builder.Services.AddSingleton<AuthLinkBuilder>();
 builder.Services.AddSingleton<IEmailSender, YahooSmtpEmailSender>();
 builder.Services.AddSingleton<IEmailService, YahooEmailService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();

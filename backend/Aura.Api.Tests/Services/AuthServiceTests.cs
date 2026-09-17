@@ -29,6 +29,22 @@ public sealed class AuthServiceTests
     }
 
     [Fact]
+    public async Task Register_removes_the_new_user_when_verification_delivery_fails()
+    {
+        _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration());
+        _users.Setup(x => x.AddAsync(It.IsAny<UserDocument>()))
+            .Callback<UserDocument>(user => user.Id = "new-user")
+            .Returns(Task.CompletedTask);
+        _email.Setup(x => x.SendVerificationAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ThrowsAsync(new InvalidOperationException("SMTP unavailable"));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            Subject().RegisterAsync(new("Name", "user@example.com", "secret"), "https://api.aura.example/api/auth/verify"));
+
+        _users.Verify(x => x.DeleteAsync("new-user"), Times.Once);
+    }
+
+    [Fact]
     public async Task Register_rejects_disabled_registration()
     { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration { RegistrationEnabled = false }); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().RegisterAsync(new("a", "a@b.com", "x"), "url")); Assert.Equal(403, e.StatusCode); }
     [Theory, InlineData("", "a@b.com", "x"), InlineData("a", "invalid", "x"), InlineData("a", "a@b.com", "")]
