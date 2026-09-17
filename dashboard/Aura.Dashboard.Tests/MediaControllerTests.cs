@@ -1,5 +1,6 @@
 using Aura.Dashboard.Controllers;
 using Aura.Dashboard.Domain;
+using Aura.Dashboard.Models;
 using Aura.Dashboard.Repositories;
 using Aura.Dashboard.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +23,9 @@ public sealed class MediaControllerTests
 
         var result = Assert.IsType<ViewResult>(await controller.Details("media-id"));
 
-        Assert.Same(item, result.Model);
-        Assert.Equal("https://signed.example/video.mp4", controller.ViewBag.PreviewUrl);
+        var model = Assert.IsType<MediaDetailsViewModel>(result.Model);
+        Assert.Same(item, model.Media);
+        Assert.Equal("https://signed.example/video.mp4", model.PreviewUrl);
     }
 
     [Fact]
@@ -35,6 +37,18 @@ public sealed class MediaControllerTests
             Mock.Of<IAssetStorage>());
 
         Assert.IsType<NotFoundResult>(await controller.Details("missing"));
+    }
+
+    [Theory]
+    [InlineData(" Video ", "video")]
+    [InlineData("IMAGE", "image")]
+    [InlineData("audio", "audio")]
+    public void Details_normalizes_the_media_type_for_player_selection(string value, string expected)
+    {
+        var item = Media();
+        item.MediaType = value;
+
+        Assert.Equal(expected, new MediaDetailsViewModel(item, "https://signed.example/asset").MediaType);
     }
 
     private static ManagedMedia Media() => new()
