@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
 import { api } from '../api';
 import MediaSection from '../components/MediaSection';
 import { ErrorState, LoadingState } from '../components/States';
