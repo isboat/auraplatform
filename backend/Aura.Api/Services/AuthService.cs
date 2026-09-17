@@ -17,7 +17,16 @@ public sealed class AuthService(IUserRepository users, IConfigurationRepository 
         if (await users.EmailExistsAsync(normalized)) throw new ServiceException(409, "An account with this email already exists.");
         var user = new UserDocument { Name = request.Name.Trim(), Email = normalized, PasswordHash = passwords.Hash(request.Password) };
         await users.AddAsync(user);
-        await email.SendVerificationAsync(user.Email, $"{verificationBaseUrl}?token={user.VerificationToken}");
+        try
+        {
+            await email.SendVerificationAsync(user.Email, $"{verificationBaseUrl}?token={user.VerificationToken}");
+        }
+        catch
+        {
+            if (user.Id is not null)
+                await users.DeleteAsync(user.Id);
+            throw;
+        }
         return new("Check your email to complete account setup.");
     }
 

@@ -33,11 +33,15 @@ Settings can come from `backend/Aura.Api/appsettings.json`, environment-specific
 | `Jwt:Audience` | Yes | Expected JWT audience. |
 | `Jwt:Key` | Yes | Signing key; replace the development value with a secret of at least 32 characters. |
 | `FrontendUrl` | No | Allowed CORS origin; defaults to `http://localhost:5173`. |
+| `AuthLinks:ApiPublicUrl` | Yes | Canonical public API origin used for verification links; never derived from request headers. |
+| `AuthLinks:FrontendPublicUrl` | Yes | Canonical public frontend origin used for password-reset links. |
 | `MediaStorage:Provider` | Yes | `S3` or `Azure`; defaults to `S3`. |
 | `AWS:Region` | For S3 | AWS region containing the bucket. |
 | `AWS:BucketName` | For S3 | Bucket used for media objects. |
 | `AzureStorage:ConnectionString` | For Azure | Connection string containing `AccountKey` or `SharedAccessSignature`. |
 | `AzureStorage:ContainerName` | For Azure | Blob container; defaults to `aura-media`. |
+| `YahooMail:EmailAddress` | Yes | Yahoo address used as the SMTP sender and username. |
+| `YahooMail:Passkey` | Yes | Yahoo app password used to authenticate to SMTP. |
 
 Do not commit production connection strings, JWT keys, account keys, or SAS tokens. Prefer environment variables or a managed secret store.
 
@@ -65,7 +69,9 @@ Azure uploads use staged blocks. With an account-key connection string, the back
 
 ## Authentication and authorization
 
-Registration creates an unverified account and sends a verification link through `IEmailService`. The included adapter logs that link; replace it with a production email provider before deployment. Login returns a JWT after verification. Send it to protected routes as:
+Registration creates an unverified account and sends a verification link through `IEmailService`. The Yahoo adapter connects to `smtp.mail.yahoo.com` with TLS and authenticates with the configured email address and app password. Supply both settings through a secret store or environment variables (for example, `YahooMail__EmailAddress` and `YahooMail__Passkey`); never commit the passkey. Login returns a JWT after verification. Send it to protected routes as:
+
+Set `AuthLinks__ApiPublicUrl` and `AuthLinks__FrontendPublicUrl` to trusted deployment origins. Verification links are deliberately built from this configuration rather than the incoming HTTP `Host` header. If initial verification delivery fails, registration is rolled back so the user can retry without leaving an inaccessible account behind.
 
 ```http
 Authorization: Bearer <token>
