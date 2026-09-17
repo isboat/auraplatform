@@ -38,6 +38,8 @@ Settings can come from `backend/Aura.Api/appsettings.json`, environment-specific
 | `AWS:BucketName` | For S3 | Bucket used for media objects. |
 | `AzureStorage:ConnectionString` | For Azure | Connection string containing `AccountKey` or `SharedAccessSignature`. |
 | `AzureStorage:ContainerName` | For Azure | Blob container; defaults to `aura-media`. |
+| `YahooMail:EmailAddress` | Yes | Yahoo address used as the SMTP sender and username. |
+| `YahooMail:Passkey` | Yes | Yahoo app password used to authenticate to SMTP. |
 
 Do not commit production connection strings, JWT keys, account keys, or SAS tokens. Prefer environment variables or a managed secret store.
 
@@ -65,7 +67,7 @@ Azure uploads use staged blocks. With an account-key connection string, the back
 
 ## Authentication and authorization
 
-Registration creates an unverified account and sends a verification link through `IEmailService`. The included adapter logs that link; replace it with a production email provider before deployment. Login returns a JWT after verification. Send it to protected routes as:
+Registration creates an unverified account and sends a verification link through `IEmailService`. The Yahoo adapter connects to `smtp.mail.yahoo.com` with TLS and authenticates with the configured email address and app password. Supply both settings through a secret store or environment variables (for example, `YahooMail__EmailAddress` and `YahooMail__Passkey`); never commit the passkey. Login returns a JWT after verification. Send it to protected routes as:
 
 ```http
 Authorization: Bearer <token>

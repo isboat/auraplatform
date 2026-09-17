@@ -20,8 +20,14 @@ builder.Services.AddSingleton<IAssetStorage>(services =>
         "AZURE" => ActivatorUtilities.CreateInstance<AzureBlobAssetStorage>(services),
         _ => throw new InvalidOperationException($"Unsupported media storage provider '{provider}'. Use 'S3' or 'Azure'.")
     };
-});builder.Services.AddSingleton<IResetDelivery,LoggingResetDelivery>();builder.Services.AddScoped<IModerationService,ModerationService>();builder.Services.AddScoped<IUserManagementService,UserManagementService>();builder.Services.AddScoped<IMediaManagementService,MediaManagementService>();builder.Services.AddScoped<IReportingService,ReportingService>();
-builder.Services.AddSingleton<IStaffInvitationDelivery, LoggingStaffInvitationDelivery>();
+});
+builder.Services.Configure<YahooMailOptions>(builder.Configuration.GetSection(YahooMailOptions.SectionName));
+builder.Services.Configure<DashboardLinkOptions>(builder.Configuration.GetSection(DashboardLinkOptions.SectionName));
+builder.Services.AddSingleton<IEmailSender, YahooSmtpEmailSender>();
+builder.Services.AddSingleton<DashboardLinkBuilder>();
+builder.Services.AddSingleton<IResetDelivery, YahooResetDelivery>();
+builder.Services.AddSingleton<IStaffInvitationDelivery, YahooStaffInvitationDelivery>();
+builder.Services.AddScoped<IModerationService,ModerationService>();builder.Services.AddScoped<IUserManagementService,UserManagementService>();builder.Services.AddScoped<IMediaManagementService,MediaManagementService>();builder.Services.AddScoped<IReportingService,ReportingService>();
 builder.Services.AddSingleton<ISecureTokenService, SecureTokenService>();
 builder.Services.AddScoped<IStaffBootstrapService, StaffBootstrapService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(o=>{o.LoginPath="/Account/Login";o.AccessDeniedPath="/Account/AccessDenied";o.Cookie.Name="__Host-Aura.Management";o.Cookie.HttpOnly=true;o.Cookie.SecurePolicy=CookieSecurePolicy.Always;o.Cookie.SameSite=SameSiteMode.Strict;o.SlidingExpiration=true;o.ExpireTimeSpan=TimeSpan.FromMinutes(builder.Configuration.GetValue("Security:IdleMinutes",30));o.Events.OnValidatePrincipal=async c=>{var id=c.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;var version=c.Principal?.FindFirst("session_version")?.Value;var user=id is null?null:await c.HttpContext.RequestServices.GetRequiredService<IUserRepository>().FindAsync(id);if(user is null||user.IsBlocked||!user.IsReviewer||version!=user.SessionVersion.ToString())c.RejectPrincipal();};});

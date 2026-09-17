@@ -23,7 +23,9 @@ builder.Services.AddSingleton<IMediaStorage>(services =>
         _ => throw new InvalidOperationException($"Unsupported media storage provider '{provider}'. Use 'S3' or 'Azure'.")
     };
 });
-builder.Services.AddSingleton<IEmailService, LoggingEmailService>();
+builder.Services.Configure<YahooMailOptions>(builder.Configuration.GetSection(YahooMailOptions.SectionName));
+builder.Services.AddSingleton<IEmailSender, YahooSmtpEmailSender>();
+builder.Services.AddSingleton<IEmailService, YahooEmailService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddSingleton<IClock, SystemClock>();
