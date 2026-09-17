@@ -1,0 +1,52 @@
+@model MediaDetailsViewModel
+@{ ViewData["Title"] = "View media"; }
+
+<a class="back" asp-action="Index">← Back to media library</a>
+<div class="detail-grid">
+    <section class="panel preview">
+        <h2>@Model.Media.Title</h2>
+        @if (Model.MediaType == "image")
+        {
+            <img src="@Model.PreviewUrl" alt="@Model.Media.Title">
+        }
+        else if (Model.MediaType == "video")
+        {
+            <video controls preload="metadata" src="@Model.PreviewUrl">
+                Your browser does not support video playback.
+            </video>
+        }
+        else if (Model.MediaType == "audio")
+        {
+            <audio controls preload="metadata" src="@Model.PreviewUrl">
+                Your browser does not support audio playback.
+            </audio>
+        }
+        else
+        {
+            <p class="empty">A preview is not available for this media type.</p>
+            <a class="button" href="@Model.PreviewUrl" target="_blank" rel="noopener">Open media asset</a>
+        }
+        <p>@(string.IsNullOrWhiteSpace(Model.Media.Description) ? "No description was provided." : Model.Media.Description)</p>
+        <div class="tags">
+            @foreach (var tag in Model.Media.Tags)
+            {
+                <span>#@tag</span>
+            }
+        </div>
+    </section>
+    <section class="panel facts">
+        <h3>Media details</h3>
+        <dl>
+            <dt>Status</dt><dd><span class="badge">@Model.Media.ReviewStatus</span></dd>
+            <dt>Type</dt><dd>@Model.Media.MediaType · @Model.Media.ContentType</dd>
+            <dt>Uploader</dt><dd>@Model.Media.OwnerName</dd>
+            <dt>Uploaded</dt><dd>@Model.Media.CreatedAt.ToLocalTime().ToString("f")</dd>
+        </dl>
+        <form asp-action="Delete" method="post" onsubmit="return confirm('Permanently delete this media and stored asset?')">
+            <input type="hidden" name="id" value="@Model.Media.Id">
+            <label for="reason">Deletion reason</label>
+            <textarea id="reason" name="reason" required maxlength="500"></textarea>
+            <button class="danger">Delete media</button>
+        </form>
+    </section>
+</div>
