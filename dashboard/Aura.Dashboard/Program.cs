@@ -8,6 +8,7 @@ using System.Threading.RateLimiting;
 
 var builder=WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
+builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<MongoContext>();builder.Services.AddSingleton<IMediaRepository,MongoMediaRepository>();builder.Services.AddSingleton<IUserRepository,MongoUserRepository>();builder.Services.AddSingleton<IAuditRepository,MongoAuditRepository>();
 builder.Services.AddHostedService<MongoSchemaInitializer>();
 builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(RegionEndpoint.GetBySystemName(builder.Configuration["AWS:Region"] ?? "us-east-1")));

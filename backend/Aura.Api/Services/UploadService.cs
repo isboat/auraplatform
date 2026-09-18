@@ -4,7 +4,7 @@ using Aura.Api.Repositories;
 
 namespace Aura.Api.Services;
 
-public sealed class UploadService(IMediaRepository media, IUserRepository users, IConfigurationRepository configuration, IMediaStorage storage, IClock clock) : IUploadService
+public sealed class UploadService(IMediaRepository media, IUserRepository users, IConfigurationService configuration, IMediaStorage storage, IClock clock) : IUploadService
 {
     public async Task<UploadResponse> BeginAsync(UploadRequest request, string userId)
     {

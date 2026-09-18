@@ -9,7 +9,7 @@ namespace Aura.Api.Tests.Services;
 
 public sealed class UploadServiceTests
 {
-    private readonly Mock<IMediaRepository> _media = new(); private readonly Mock<IUserRepository> _users = new(); private readonly Mock<IConfigurationRepository> _configuration = new(); private readonly Mock<IMediaStorage> _storage = new(); private readonly Mock<IClock> _clock = new();
+    private readonly Mock<IMediaRepository> _media = new(); private readonly Mock<IUserRepository> _users = new(); private readonly Mock<IConfigurationService> _configuration = new(); private readonly Mock<IMediaStorage> _storage = new(); private readonly Mock<IClock> _clock = new();
     private UploadService Subject() => new(_media.Object, _users.Object, _configuration.Object, _storage.Object, _clock.Object);
     private void ValidSetup()
     {

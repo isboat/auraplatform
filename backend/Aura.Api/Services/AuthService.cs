@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Aura.Api.Services;
 
-public sealed class AuthService(IUserRepository users, IConfigurationRepository configuration, IPasswordHasher passwords, ITokenService tokens, IEmailService email, IClock clock) : IAuthService
+public sealed class AuthService(IUserRepository users, IConfigurationService configuration, IPasswordHasher passwords, ITokenService tokens, IEmailService email, IClock clock) : IAuthService
 {
     private const string ResetRequestedMessage = "If an account exists for that verified email address, a password reset link has been sent.";
     public async Task<MessageResponse> RegisterAsync(RegisterRequest request, string verificationBaseUrl)
