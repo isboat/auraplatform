@@ -1,24 +1,26 @@
 using Aura.Api.Models;
 using Aura.Api.Repositories;
 using Aura.Api.Services;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 namespace Aura.Api.Tests.Services;
 
 public sealed class ConfigurationServiceTests
 {
     [Fact]
-    public async Task Get_reads_current_repository_result_every_time()
+    public async Task Get_caches_repository_result_for_one_minute()
     {
         var repo = new Mock<IConfigurationRepository>();
-        var original = new PlatformConfiguration { RegistrationEnabled = true };
-        var updated = new PlatformConfiguration { RegistrationEnabled = false };
-        repo.SetupSequence(x => x.GetAsync()).ReturnsAsync(original).ReturnsAsync(updated);
-        var service = new ConfigurationService(repo.Object);
+        var expected = new PlatformConfiguration { RegistrationEnabled = true };
+        repo.Setup(x => x.GetAsync()).ReturnsAsync(expected);
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var service = new ConfigurationService(repo.Object, cache);
 
-        Assert.Same(original, await service.GetAsync());
-        Assert.Same(updated, await service.GetAsync());
+        Assert.Equal(TimeSpan.FromMinutes(1), ConfigurationService.CacheDuration);
+        Assert.Same(expected, await service.GetAsync());
+        Assert.Same(expected, await service.GetAsync());
 
-        repo.Verify(x => x.GetAsync(), Times.Exactly(2));
+        repo.Verify(x => x.GetAsync(), Times.Once);
     }
 
     [Fact]
@@ -27,13 +29,16 @@ public sealed class ConfigurationServiceTests
         var repo = new Mock<IConfigurationRepository>();
         PlatformConfiguration? saved = null;
         repo.Setup(x => x.SaveAsync(It.IsAny<PlatformConfiguration>())).Callback<PlatformConfiguration>(x => saved = x).Returns(Task.CompletedTask);
-        var service = new ConfigurationService(repo.Object);
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var service = new ConfigurationService(repo.Object, cache);
 
         var result = await service.UpdateAsync(new(false, true));
 
         Assert.Same(saved, result);
         Assert.False(result.RegistrationEnabled);
         Assert.True(result.UploadsEnabled);
+        Assert.Same(result, await service.GetAsync());
         repo.Verify(x => x.SaveAsync(result), Times.Once);
+        repo.Verify(x => x.GetAsync(), Times.Never);
     }
 }
