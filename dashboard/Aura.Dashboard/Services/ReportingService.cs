@@ -7,7 +7,7 @@ namespace Aura.Dashboard.Services;
 public sealed class ReportingService(IMediaRepository media,IUserRepository users,IMemoryCache cache):IReportingService
 {
  private const string CacheKey="dashboard-metrics";
- public Task<DashboardMetrics> GetAsync()=>cache.GetOrCreateAsync(CacheKey,async entry=>
+ public Task<DashboardMetrics> GetAsync()=>cache.GetOrCreateAsync<DashboardMetrics>(CacheKey,async entry=>
  {
   // Dashboard writes may originate in another process, so keep this local cache deliberately short-lived.
   entry.AbsoluteExpirationRelativeToNow=TimeSpan.FromSeconds(15);

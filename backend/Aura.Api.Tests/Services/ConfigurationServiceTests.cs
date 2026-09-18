@@ -41,4 +41,35 @@ public sealed class ConfigurationServiceTests
         Assert.True(result.UploadsEnabled);
         repo.Verify(x => x.GetAsync(), Times.Once);
     }
+
+    [Fact]
+    public async Task Update_wins_when_a_cache_fill_is_already_in_progress()
+    {
+        var readStarted = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseRead = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var repo = new Mock<IConfigurationRepository>();
+        repo.Setup(x => x.GetAsync()).Returns(async () =>
+        {
+            readStarted.SetResult(true);
+            await releaseRead.Task;
+            return new PlatformConfiguration { RegistrationEnabled = true, UploadsEnabled = false };
+        });
+        repo.Setup(x => x.SaveAsync(It.IsAny<PlatformConfiguration>())).Returns(Task.CompletedTask);
+        using var cache = new MemoryCache(new MemoryCacheOptions());
+        var service = new ConfigurationService(repo.Object, cache);
+
+        var fill = service.GetAsync();
+        await readStarted.Task;
+        var update = service.UpdateAsync(new(false, true));
+        Assert.False(update.IsCompleted);
+
+        releaseRead.SetResult(true);
+        await fill;
+        var updated = await update;
+
+        Assert.Same(updated, await service.GetAsync());
+        Assert.False(updated.RegistrationEnabled);
+        Assert.True(updated.UploadsEnabled);
+        repo.Verify(x => x.GetAsync(), Times.Once);
+    }
 }
