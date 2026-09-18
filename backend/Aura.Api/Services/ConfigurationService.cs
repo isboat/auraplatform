@@ -7,6 +7,7 @@ namespace Aura.Api.Services;
 public sealed class ConfigurationService(IConfigurationRepository repository, IMemoryCache cache) : IConfigurationService
 {
     private const string CacheKey = "platform-configuration";
+    internal static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(1);
     private static readonly SemaphoreSlim CacheGate = new(1, 1);
 
     public async Task<PlatformConfiguration> GetAsync()
@@ -21,7 +22,7 @@ public sealed class ConfigurationService(IConfigurationRepository repository, IM
                 return cached!;
 
             var value = await repository.GetAsync();
-            cache.Set(CacheKey, value, TimeSpan.FromMinutes(1));
+            cache.Set(CacheKey, value, CacheDuration);
             return value;
         }
         finally
@@ -37,7 +38,7 @@ public sealed class ConfigurationService(IConfigurationRepository repository, IM
         try
         {
             await repository.SaveAsync(value);
-            cache.Set(CacheKey, value, TimeSpan.FromMinutes(1));
+            cache.Set(CacheKey, value, CacheDuration);
             return value;
         }
         finally

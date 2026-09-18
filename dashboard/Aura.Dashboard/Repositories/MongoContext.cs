@@ -19,4 +19,5 @@ public sealed class MongoContext
     public IMongoCollection<MongoDB.Bson.BsonDocument> BootstrapLocks => _db.GetCollection<MongoDB.Bson.BsonDocument>(MongoCollectionNames.BootstrapLocks);
     public IMongoCollection<ManagedMedia> Media => _db.GetCollection<ManagedMedia>(MongoCollectionNames.Media);
     public IMongoCollection<AuditEvent> Audit => _db.GetCollection<AuditEvent>(MongoCollectionNames.Audit);
+    public IMongoCollection<PlatformConfiguration> Configuration => _db.GetCollection<PlatformConfiguration>(MongoCollectionNames.Configuration);
 }

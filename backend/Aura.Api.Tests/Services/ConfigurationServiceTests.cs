@@ -8,6 +8,12 @@ namespace Aura.Api.Tests.Services;
 public sealed class ConfigurationServiceTests
 {
     [Fact]
+    public void Cache_duration_is_one_minute()
+    {
+        Assert.Equal(TimeSpan.FromMinutes(1), ConfigurationService.CacheDuration);
+    }
+
+    [Fact]
     public async Task Get_caches_repository_result()
     {
         var repo = new Mock<IConfigurationRepository>();

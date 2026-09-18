@@ -10,9 +10,10 @@ instances.
 
 The platform feature flags are read for registration, upload, and configuration API
 requests, but they change infrequently. The API caches `PlatformConfiguration` for
-one minute and immediately replaces the local cached value after a successful update.
-Registration and upload services use the configuration service so these requests
-share the cached read.
+one minute with an absolute expiration and immediately replaces the local cached
+value after a successful API update. Registration and upload services use the
+configuration service so these requests share the cached read. Changes written by a
+separate dashboard process can take up to one minute to reach an API instance.
 
 User records, JWT session versions, media details, reactions, view counts, comments,
 and signed media URLs are intentionally not cached. Those values either participate

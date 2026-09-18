@@ -1,0 +1,28 @@
+@model ConfigurationViewModel
+@{
+    ViewData["Title"] = "Platform configuration";
+}
+
+<section class="panel user-card configuration-panel">
+    <span class="eyebrow">PUBLIC PLATFORM ACCESS</span>
+    <h2>Registration and uploads</h2>
+    <p>Control whether visitors can create accounts and whether signed-in members can upload media.</p>
+
+    <form method="post">
+        <div class="setting-row">
+            <div>
+                <label asp-for="RegistrationEnabled">Allow registration</label>
+                <small>When disabled, new visitors cannot create an account.</small>
+            </div>
+            <input asp-for="RegistrationEnabled" class="toggle" type="checkbox">
+        </div>
+        <div class="setting-row">
+            <div>
+                <label asp-for="UploadsEnabled">Allow uploads</label>
+                <small>When disabled, members cannot submit new media.</small>
+            </div>
+            <input asp-for="UploadsEnabled" class="toggle" type="checkbox">
+        </div>
+        <button type="submit">Save configuration</button>
+    </form>
+</section>
