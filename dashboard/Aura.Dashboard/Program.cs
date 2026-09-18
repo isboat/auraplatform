@@ -9,7 +9,7 @@ using System.Threading.RateLimiting;
 var builder=WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();
-builder.Services.AddSingleton<MongoContext>();builder.Services.AddSingleton<IMediaRepository,MongoMediaRepository>();builder.Services.AddSingleton<IUserRepository,MongoUserRepository>();builder.Services.AddSingleton<IAuditRepository,MongoAuditRepository>();
+builder.Services.AddSingleton<MongoContext>();builder.Services.AddSingleton<IMediaRepository,MongoMediaRepository>();builder.Services.AddSingleton<IUserRepository,MongoUserRepository>();builder.Services.AddSingleton<IAuditRepository,MongoAuditRepository>();builder.Services.AddSingleton<IConfigurationRepository,MongoConfigurationRepository>();
 builder.Services.AddHostedService<MongoSchemaInitializer>();
 builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(RegionEndpoint.GetBySystemName(builder.Configuration["AWS:Region"] ?? "us-east-1")));
 builder.Services.AddSingleton<IAssetStorage>(services =>
@@ -28,7 +28,7 @@ builder.Services.AddSingleton<IEmailSender, YahooSmtpEmailSender>();
 builder.Services.AddSingleton<DashboardLinkBuilder>();
 builder.Services.AddSingleton<IResetDelivery, YahooResetDelivery>();
 builder.Services.AddSingleton<IStaffInvitationDelivery, YahooStaffInvitationDelivery>();
-builder.Services.AddScoped<IModerationService,ModerationService>();builder.Services.AddScoped<IUserManagementService,UserManagementService>();builder.Services.AddScoped<IMediaManagementService,MediaManagementService>();builder.Services.AddScoped<IReportingService,ReportingService>();
+builder.Services.AddScoped<IModerationService,ModerationService>();builder.Services.AddScoped<IUserManagementService,UserManagementService>();builder.Services.AddScoped<IMediaManagementService,MediaManagementService>();builder.Services.AddScoped<IReportingService,ReportingService>();builder.Services.AddScoped<IConfigurationManagementService,ConfigurationManagementService>();
 builder.Services.AddSingleton<ISecureTokenService, SecureTokenService>();
 builder.Services.AddScoped<IStaffCredentialService, StaffCredentialService>();
 builder.Services.AddScoped<IStaffBootstrapService, StaffBootstrapService>();
