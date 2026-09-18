@@ -3,26 +3,60 @@
     ViewData["Title"] = "Platform configuration";
 }
 
-<section class="panel user-card configuration-panel">
-    <span class="eyebrow">PUBLIC PLATFORM ACCESS</span>
-    <h2>Registration and uploads</h2>
-    <p>Control whether visitors can create accounts and whether signed-in members can upload media.</p>
+<div class="configuration-shell">
+    <section class="configuration-hero">
+        <div class="configuration-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.09A1.7 1.7 0 0 0 8.94 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.57 15 1.7 1.7 0 0 0 3 14H3v-4h.09A1.7 1.7 0 0 0 4.6 8.94a1.7 1.7 0 0 0-.34-1.88L4.2 7l2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.57h.01A1.7 1.7 0 0 0 10 3.09V3h4v.09A1.7 1.7 0 0 0 15.06 4.6a1.7 1.7 0 0 0 1.88-.34L17 4.2 19.83 7l-.06.06a1.7 1.7 0 0 0-.34 1.88v.01A1.7 1.7 0 0 0 20.91 10H21v4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+        </div>
+        <div>
+            <span class="eyebrow">PLATFORM SETTINGS</span>
+            <h2>Shape your community experience</h2>
+            <p>Manage how people join Aura and share their work. Changes take effect across the public platform immediately.</p>
+        </div>
+    </section>
 
-    <form method="post">
-        <div class="setting-row">
+    <form method="post" class="configuration-form">
+        <div class="configuration-heading">
             <div>
-                <label asp-for="RegistrationEnabled">Allow registration</label>
-                <small>When disabled, new visitors cannot create an account.</small>
+                <span class="eyebrow">PUBLIC ACCESS</span>
+                <h3>Registration and uploads</h3>
+                <p>Choose which community features are currently available.</p>
             </div>
-            <input asp-for="RegistrationEnabled" class="toggle" type="checkbox">
+            <span class="live-status"><i></i> Live settings</span>
         </div>
-        <div class="setting-row">
-            <div>
-                <label asp-for="UploadsEnabled">Allow uploads</label>
-                <small>When disabled, members cannot submit new media.</small>
+
+        <div class="setting-list">
+            <div class="setting-row">
+                <div class="setting-symbol registration-symbol" aria-hidden="true">+</div>
+                <div class="setting-copy">
+                    <label asp-for="RegistrationEnabled">New member registration</label>
+                    <small>Allow visitors to create an Aura account and join the community.</small>
+                    <span class="setting-state">@(Model.RegistrationEnabled ? "Currently available" : "Currently paused")</span>
+                </div>
+                <label class="switch">
+                    <input asp-for="RegistrationEnabled" type="checkbox">
+                    <span class="switch-track" aria-hidden="true"></span>
+                    <span class="sr-only">Allow new member registration</span>
+                </label>
             </div>
-            <input asp-for="UploadsEnabled" class="toggle" type="checkbox">
+            <div class="setting-row">
+                <div class="setting-symbol upload-symbol" aria-hidden="true">↑</div>
+                <div class="setting-copy">
+                    <label asp-for="UploadsEnabled">Member media uploads</label>
+                    <small>Allow signed-in members to upload and submit new media.</small>
+                    <span class="setting-state">@(Model.UploadsEnabled ? "Currently available" : "Currently paused")</span>
+                </div>
+                <label class="switch">
+                    <input asp-for="UploadsEnabled" type="checkbox">
+                    <span class="switch-track" aria-hidden="true"></span>
+                    <span class="sr-only">Allow member media uploads</span>
+                </label>
+            </div>
         </div>
-        <button type="submit">Save configuration</button>
+
+        <div class="configuration-footer">
+            <p><strong>Ready to publish?</strong><span>Your selections will apply immediately.</span></p>
+            <button type="submit">Save changes <span aria-hidden="true">→</span></button>
+        </div>
     </form>
-</section>
+</div>
