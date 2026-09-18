@@ -8,15 +8,15 @@ instances.
 
 ## Backend API
 
-The platform feature flags are read for registration, upload, and configuration API
-requests, but they change infrequently. The API caches `PlatformConfiguration` for
-one minute and immediately replaces the local cached value after a successful update.
-Registration and upload services use the configuration service so these requests
-share the cached read.
+The platform feature flags are read directly from MongoDB for registration, upload,
+and configuration API requests. These flags control access and can also be changed by
+the separately deployed management dashboard, so process-local caching could allow a
+disabled operation until every API instance's cache expired.
 
-User records, JWT session versions, media details, reactions, view counts, comments,
-and signed media URLs are intentionally not cached. Those values either participate
-in authentication/authorization, change often, or must reflect a write immediately.
+User records, JWT session versions, platform configuration, media details, reactions,
+view counts, comments, and signed media URLs are intentionally not cached. Those
+values either participate in authentication/authorization, change often, or must
+reflect a write immediately.
 In particular, caching the session-version lookup could allow a revoked session to
 remain valid.
 

@@ -8,4 +8,5 @@ public static class MongoCollectionNames
     public const string BootstrapLocks = "managementBootstrapLocks";
     public const string Media = "media";
     public const string Audit = "managementAudit";
+    public const string Configuration = "configuration";
 }
