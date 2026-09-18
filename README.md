@@ -9,6 +9,7 @@ Aura is a responsive media-hosting platform for videos, images, and audio. It in
 - [`dashboard`](dashboard/README.md) — .NET 10 ASP.NET Core MVC management dashboard for staff workflows.
 - `doc/project-overview.md` — product and architecture requirements.
 - [`doc/management-dashboard.md`](doc/management-dashboard.md) — requirements for the .NET MVC administration and content-review application.
+- [`doc/memory-caching.md`](doc/memory-caching.md) — assessment of safe cache candidates, exclusions, and scaling limitations.
 
 ## Frontend
 

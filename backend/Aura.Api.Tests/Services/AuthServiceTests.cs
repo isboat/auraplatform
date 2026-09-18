@@ -10,7 +10,7 @@ namespace Aura.Api.Tests.Services;
 public sealed class AuthServiceTests
 {
     private readonly Mock<IUserRepository> _users = new();
-    private readonly Mock<IConfigurationRepository> _configuration = new();
+    private readonly Mock<IConfigurationService> _configuration = new();
     private readonly Mock<IPasswordHasher> _passwords = new();
     private readonly Mock<ITokenService> _tokens = new();
     private readonly Mock<IEmailService> _email = new();
