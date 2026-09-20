@@ -42,6 +42,7 @@
             <dt>Uploader</dt><dd>@Model.Media.OwnerName</dd>
             <dt>Uploaded</dt><dd>@Model.Media.CreatedAt.ToLocalTime().ToString("f")</dd>
         </dl>
+        <partial name="_UploadMetadata" model="Model.Media.UploadMetadata" />
         <form asp-action="Delete" method="post" onsubmit="return confirm('Permanently delete this media and stored asset?')">
             <input type="hidden" name="id" value="@Model.Media.Id">
             <label for="reason">Deletion reason</label>
