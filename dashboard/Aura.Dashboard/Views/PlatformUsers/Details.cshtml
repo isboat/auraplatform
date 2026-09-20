@@ -1,0 +1,15 @@
+@model PlatformUser
+@{ ViewData["Title"] = "Platform user"; }
+
+<a class="back" asp-action="Index">← Back to platform users</a>
+<section class="panel user-card">
+    <span class="eyebrow">REGISTERED VIA API</span>
+    <h2>@Model.Name</h2>
+    <p>@Model.Email</p>
+    <dl class="account-details">
+        <dt>Registered</dt><dd>@(Model.CreatedAt == default ? "Not available" : Model.CreatedAt.ToLocalTime().ToString("f"))</dd>
+        <dt>Verification</dt><dd>@(Model.EmailVerified ? "Verified" : "Unverified")</dd>
+    </dl>
+    @{ ViewData["MetadataTitle"] = "Registration metadata"; ViewData["MetadataEmptyMessage"] = "Metadata was not captured when this platform user registered."; }
+    <partial name="_ClientMetadata" model="Model.RegistrationMetadata" />
+</section>

@@ -15,7 +15,6 @@ public sealed class StaffUser
     public bool IsAdministrator { get; set; }
     public List<string> Roles { get; set; } = [];
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public ClientMetadata? RegistrationMetadata { get; set; }
     public int SessionVersion { get; set; }
     public string? InvitationTokenHash { get; set; }
     public DateTime? InvitationExpiresAtUtc { get; set; }

@@ -7,6 +7,7 @@ namespace Aura.Dashboard.Tests;
 public sealed class ServiceTests
 {
  [Fact]public void Dashboard_users_have_a_dedicated_collection(){Assert.Equal("staffuser",MongoCollectionNames.StaffUsers);}
+ [Fact]public void Platform_users_use_the_backend_api_collection(){Assert.Equal("users",MongoCollectionNames.PlatformUsers);}
  static StaffActor Actor()=>new("a","Alex","a@a.test",Roles.Administrator,"trace");static ManagedMedia Media()=>new(){Id="m",OwnerId="u",OwnerName="Uma",Title="Clip",MediaType="video",ObjectKey="clip"};static StaffUser User()=>new(){Id="u",Name="Uma",Email="u@a.test",PasswordHash="hash",EmailVerified=true};
  [Fact]public async Task Reject_requires_reason(){var sut=new ModerationService(Mock.Of<IMediaRepository>(),Mock.Of<IAuditRepository>());await Assert.ThrowsAsync<DashboardRuleException>(()=>sut.DecideAsync("m",false," ",Actor()));}
  [Fact]public async Task Decision_is_atomic_and_audited(){var mr=new Mock<IMediaRepository>();mr.Setup(x=>x.FindAsync("m")).ReturnsAsync(Media());mr.Setup(x=>x.TrySetReviewStatusAsync("m",ReviewStates.InReview,ReviewStates.Approved)).ReturnsAsync(true);var ar=new Mock<IAuditRepository>();await new ModerationService(mr.Object,ar.Object).DecideAsync("m",true,"fine",Actor());ar.Verify(x=>x.AppendAsync(It.Is<AuditEvent>(e=>e.EventType=="MediaApproved"&&e.Reason=="fine")));}

@@ -73,6 +73,37 @@ public sealed class MongoDocumentCompatibilityTests
         Assert.Equal("admin@example.com", user.Email);
         Assert.True(user.IsAdmin);
         Assert.Equal(registeredAt, user.CreatedAt);
+    }
+
+    [Fact]
+    public void Platform_user_reads_backend_registration_fields()
+    {
+        var registeredAt = new DateTime(2026, 9, 20, 14, 30, 0, DateTimeKind.Utc);
+        var document = new BsonDocument
+        {
+            ["_id"] = ObjectId.GenerateNewId(),
+            ["Name"] = "Platform User",
+            ["Email"] = "user@example.com",
+            ["PasswordHash"] = "not-loaded-by-dashboard",
+            ["EmailVerified"] = true,
+            ["CreatedAt"] = registeredAt,
+            ["RegistrationMetadata"] = new BsonDocument
+            {
+                ["IpAddress"] = "203.0.113.10",
+                ["Browser"] = "Firefox 143.0",
+                ["Device"] = "Desktop",
+                ["Country"] = "GB",
+                ["Region"] = "ENG",
+                ["City"] = "London",
+                ["TimeZone"] = "Europe/London"
+            }
+        };
+
+        var user = BsonSerializer.Deserialize<PlatformUser>(document);
+
+        Assert.Equal("user@example.com", user.Email);
+        Assert.True(user.EmailVerified);
+        Assert.Equal(registeredAt, user.CreatedAt);
         Assert.Equal("203.0.113.10", user.RegistrationMetadata!.IpAddress);
         Assert.Equal("Firefox 143.0", user.RegistrationMetadata.Browser);
         Assert.Equal("Desktop", user.RegistrationMetadata.Device);
