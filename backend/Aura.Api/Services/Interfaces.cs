@@ -34,7 +34,7 @@ public interface IMediaService
 }
 public interface IUploadService
 {
-    Task<UploadResponse> BeginAsync(UploadRequest request, string userId);
+    Task<UploadResponse> BeginAsync(UploadRequest request, string userId, UploadMetadata metadata);
     Task<MessageResponse> CompleteAsync(string id, CompleteUploadRequest request, string userId);
 }
 public interface ICommentService
