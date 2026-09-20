@@ -1,10 +1,14 @@
-@model UploadMetadata?
+@model ClientMetadata?
+@{
+    var title = ViewData["MetadataTitle"] as string ?? "Client metadata";
+    var emptyMessage = ViewData["MetadataEmptyMessage"] as string ?? "Client metadata was not captured.";
+}
 
-<div class="upload-metadata">
-    <h4>Upload metadata</h4>
+<div class="client-metadata">
+    <h4>@title</h4>
     @if (Model is null)
     {
-        <p class="metadata-empty">Metadata was not captured for this upload.</p>
+        <p class="metadata-empty">@emptyMessage</p>
     }
     else
     {
@@ -22,7 +26,7 @@
 </div>
 
 @functions {
-    private static string FormatLocation(UploadMetadata metadata)
+    private static string FormatLocation(ClientMetadata metadata)
     {
         var parts = new[] { metadata.City, metadata.Region, metadata.Country }
             .Where(value => !string.IsNullOrWhiteSpace(value));
