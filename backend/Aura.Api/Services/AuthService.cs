@@ -19,6 +19,7 @@ public sealed class AuthService(IUserRepository users, IConfigurationService con
         {
             Name = request.Name.Trim(),
             Email = normalized,
+            Phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim(),
             PasswordHash = passwords.Hash(request.Password),
             CreatedAt = clock.UtcNow,
             RegistrationMetadata = metadata
