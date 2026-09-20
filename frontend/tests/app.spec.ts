@@ -25,7 +25,7 @@ test('registration offers an optional phone number and sends it to the API', asy
   await page.route('http://localhost:5080/api/**', async route => {
     const path = new URL(route.request().url()).pathname;
     if (path === '/api/configuration') return route.fulfill({ json: { id: 'platform', registrationEnabled: true, uploadsEnabled: true } });
-    expect(route.request().postDataJSON()).toEqual({ name: 'Jamie', email: 'jamie@example.com', password: 'password', phone: '+1 202 555 0147' });
+    expect(route.request().postDataJSON()).toEqual({ name: 'Jamie', email: 'jamie@example.com', password: 'password', phoneNumber: '+1 202 555 0147' });
     return route.fulfill({ status: 202, json: { message: 'Check your email to complete account setup.' } });
   });
 

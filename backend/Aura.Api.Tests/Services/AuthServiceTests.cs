@@ -29,7 +29,7 @@ public sealed class AuthServiceTests
         var result = await Subject().RegisterAsync(new(" Name ", " USER@Example.COM ", "secret", " +1 202 555 0147 "), "https://aura/verify", metadata);
         Assert.Equal("Check your email to complete account setup.", result.Message); Assert.Equal("user@example.com", added!.Email); Assert.Equal("Name", added.Name); Assert.Equal("hashed", added.PasswordHash);
         Assert.Equal(registeredAt, added.CreatedAt);
-        Assert.Equal("+1 202 555 0147", added.Phone);
+        Assert.Equal("+1 202 555 0147", added.PhoneNumber);
         Assert.Same(metadata, added.RegistrationMetadata);
         _email.Verify(x => x.SendVerificationAsync("user@example.com", It.Is<string>(url => url.StartsWith("https://aura/verify?token="))), Times.Once);
     }
@@ -59,6 +59,9 @@ public sealed class AuthServiceTests
     [Fact]
     public async Task Register_rejects_duplicate_email()
     { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration()); _users.Setup(x => x.EmailExistsAsync("a@b.com")).ReturnsAsync(true); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().RegisterAsync(new("a", "a@b.com", "x"), "url", new ClientMetadata())); Assert.Equal(409, e.StatusCode); }
+    [Fact]
+    public async Task Register_rejects_phone_numbers_longer_than_the_frontend_limit()
+    { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration()); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().RegisterAsync(new("a", "a@b.com", "x", new string('1', 31)), "url", new ClientMetadata())); Assert.Equal(400, e.StatusCode); }
     [Fact]
     public async Task Verify_returns_confirmation()
     { _users.Setup(x => x.VerifyAsync("token")).ReturnsAsync(true); Assert.Equal("Your account is verified.", (await Subject().VerifyAsync("token")).Message); }

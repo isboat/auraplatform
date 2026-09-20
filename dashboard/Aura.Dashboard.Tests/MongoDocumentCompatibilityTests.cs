@@ -84,7 +84,7 @@ public sealed class MongoDocumentCompatibilityTests
             ["_id"] = ObjectId.GenerateNewId(),
             ["Name"] = "Platform User",
             ["Email"] = "user@example.com",
-            ["Phone"] = "+1 202 555 0147",
+            ["PhoneNumber"] = "+1 202 555 0147",
             ["PasswordHash"] = "not-loaded-by-dashboard",
             ["EmailVerified"] = true,
             ["CreatedAt"] = registeredAt,
@@ -103,7 +103,7 @@ public sealed class MongoDocumentCompatibilityTests
         var user = BsonSerializer.Deserialize<PlatformUser>(document);
 
         Assert.Equal("user@example.com", user.Email);
-        Assert.Equal("+1 202 555 0147", user.Phone);
+        Assert.Equal("+1 202 555 0147", user.PhoneNumber);
         Assert.True(user.EmailVerified);
         Assert.Equal(registeredAt, user.CreatedAt);
         Assert.Equal("203.0.113.10", user.RegistrationMetadata!.IpAddress);

@@ -13,13 +13,15 @@ public sealed class AuthService(IUserRepository users, IConfigurationService con
     {
         if (!(await configuration.GetAsync()).RegistrationEnabled) throw new ServiceException(403, "Registration is currently unavailable.");
         var normalized = request.Email.Trim().ToLowerInvariant();
+        var phoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password) || !normalized.Contains('@')) throw new ServiceException(400, "Name, a valid email, and password are required.");
+        if (phoneNumber?.Length > 30) throw new ServiceException(400, "Phone number must be 30 characters or fewer.");
         if (await users.EmailExistsAsync(normalized)) throw new ServiceException(409, "An account with this email already exists.");
         var user = new UserDocument
         {
             Name = request.Name.Trim(),
             Email = normalized,
-            Phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim(),
+            PhoneNumber = phoneNumber,
             PasswordHash = passwords.Hash(request.Password),
             CreatedAt = clock.UtcNow,
             RegistrationMetadata = metadata
