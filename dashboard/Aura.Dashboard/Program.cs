@@ -29,6 +29,7 @@ builder.Services.AddSingleton<DashboardLinkBuilder>();
 builder.Services.AddSingleton<IResetDelivery, YahooResetDelivery>();
 builder.Services.AddSingleton<IStaffInvitationDelivery, YahooStaffInvitationDelivery>();
 builder.Services.AddScoped<IModerationService,ModerationService>();builder.Services.AddScoped<IUserManagementService,UserManagementService>();builder.Services.AddScoped<IMediaManagementService,MediaManagementService>();builder.Services.AddScoped<IReportingService,ReportingService>();builder.Services.AddScoped<IConfigurationManagementService,ConfigurationManagementService>();
+builder.Services.AddScoped<IPlatformUserManagementService, PlatformUserManagementService>();
 builder.Services.AddSingleton<ISecureTokenService, SecureTokenService>();
 builder.Services.AddScoped<IStaffCredentialService, StaffCredentialService>();
 builder.Services.AddScoped<IStaffBootstrapService, StaffBootstrapService>();

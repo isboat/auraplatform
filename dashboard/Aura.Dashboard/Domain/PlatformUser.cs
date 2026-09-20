@@ -10,6 +10,8 @@ public sealed class PlatformUser
     public required string Name { get; set; }
     public required string Email { get; set; }
     public bool EmailVerified { get; set; }
+    public bool IsBlocked { get; set; }
+    public int SessionVersion { get; set; }
     public DateTime CreatedAt { get; set; }
     public ClientMetadata? RegistrationMetadata { get; set; }
 }

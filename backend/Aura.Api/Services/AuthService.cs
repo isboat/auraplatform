@@ -47,6 +47,7 @@ public sealed class AuthService(IUserRepository users, IConfigurationService con
     {
         var user = await users.FindByEmailAsync(request.Email.Trim().ToLowerInvariant());
         if (user is null || !passwords.Verify(request.Password, user.PasswordHash)) throw new ServiceException(401, "Email or password is incorrect.");
+        if (user.IsBlocked) throw new ServiceException(403, "Your account has been blocked. Please contact customer service at support@auraplatform.com.");
         if (!user.EmailVerified) throw new ServiceException(403, "Verify your email before signing in.");
         return new(tokens.Create(user), new(user.Id!, user.Name, user.Email, user.IsAdministrator));
     }

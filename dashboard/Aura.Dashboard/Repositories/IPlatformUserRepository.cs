@@ -6,4 +6,5 @@ public interface IPlatformUserRepository
 {
     Task<PageResult<PlatformUser>> SearchAsync(string? query, bool? verified, int page, int pageSize);
     Task<PlatformUser?> FindAsync(string id);
+    Task<bool> SetBlockedAsync(string id, bool blocked);
 }

@@ -10,6 +10,7 @@ public sealed class UserDocument
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
     public bool EmailVerified { get; set; }
+    public bool IsBlocked { get; set; }
     public string VerificationToken { get; set; } = Guid.NewGuid().ToString("N");
     public bool IsAdministrator { get; set; }
     public string? PasswordResetTokenHash { get; set; }

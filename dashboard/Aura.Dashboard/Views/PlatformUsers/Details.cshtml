@@ -9,7 +9,15 @@
     <dl class="account-details">
         <dt>Registered</dt><dd>@(Model.CreatedAt == default ? "Not available" : Model.CreatedAt.ToLocalTime().ToString("f"))</dd>
         <dt>Verification</dt><dd>@(Model.EmailVerified ? "Verified" : "Unverified")</dd>
+        <dt>Status</dt><dd><span class="badge @(Model.IsBlocked ? "rejected" : "approved")">@(Model.IsBlocked ? "Blocked" : "Active")</span></dd>
     </dl>
     @{ ViewData["MetadataTitle"] = "Registration metadata"; ViewData["MetadataEmptyMessage"] = "Metadata was not captured when this platform user registered."; }
     <partial name="_ClientMetadata" model="Model.RegistrationMetadata" />
+    <form asp-action="Block" method="post" onsubmit="return confirm('@(Model.IsBlocked ? "Unblock this platform user?" : "Block this platform user and end their active sessions?")')">
+        <input type="hidden" name="id" value="@Model.Id">
+        <input type="hidden" name="blocked" value="@(!Model.IsBlocked).ToString().ToLowerInvariant()">
+        <label for="reason">@(Model.IsBlocked ? "Unblocking reason" : "Blocking reason")</label>
+        <textarea id="reason" name="reason" required maxlength="500"></textarea>
+        <button class="@(Model.IsBlocked ? "" : "danger")">@(Model.IsBlocked ? "Unblock user" : "Block user")</button>
+    </form>
 </section>

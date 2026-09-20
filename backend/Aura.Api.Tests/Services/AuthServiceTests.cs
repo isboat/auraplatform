@@ -73,6 +73,9 @@ public sealed class AuthServiceTests
     [Fact]
     public async Task Login_rejects_unverified_user()
     { var user = TestData.User(false); _users.Setup(x => x.FindByEmailAsync(user.Email)).ReturnsAsync(user); _passwords.Setup(x => x.Verify("secret", "hash")).Returns(true); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().LoginAsync(new(user.Email, "secret"))); Assert.Equal(403, e.StatusCode); }
+    [Fact]
+    public async Task Login_rejects_blocked_user_with_customer_service_contact()
+    { var user = TestData.User(); user.IsBlocked = true; _users.Setup(x => x.FindByEmailAsync(user.Email)).ReturnsAsync(user); _passwords.Setup(x => x.Verify("secret", "hash")).Returns(true); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().LoginAsync(new(user.Email, "secret"))); Assert.Equal(403, e.StatusCode); Assert.Contains("support@auraplatform.com", e.Message); _tokens.Verify(x => x.Create(It.IsAny<UserDocument>()), Times.Never); }
 
     [Fact]
     public async Task Forgot_password_stores_expiring_hashed_token_and_sends_link()
