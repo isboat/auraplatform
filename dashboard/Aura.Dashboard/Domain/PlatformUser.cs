@@ -9,6 +9,7 @@ public sealed class PlatformUser
     [BsonId, BsonRepresentation(BsonType.ObjectId)] public string? Id { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
+    public string? PhoneNumber { get; set; }
     public bool EmailVerified { get; set; }
     public bool IsBlocked { get; set; }
     public int SessionVersion { get; set; }

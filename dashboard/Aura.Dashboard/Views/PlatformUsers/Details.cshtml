@@ -7,6 +7,7 @@
     <h2>@Model.Name</h2>
     <p>@Model.Email</p>
     <dl class="account-details">
+        <dt>Phone number</dt><dd>@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</dd>
         <dt>Registered</dt><dd>@(Model.CreatedAt == default ? "Not available" : Model.CreatedAt.ToLocalTime().ToString("f"))</dd>
         <dt>Verification</dt><dd>@(Model.EmailVerified ? "Verified" : "Unverified")</dd>
         <dt>Status</dt><dd><span class="badge @(Model.IsBlocked ? "rejected" : "approved")">@(Model.IsBlocked ? "Blocked" : "Active")</span></dd>

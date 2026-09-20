@@ -20,6 +20,25 @@ async function mockApi(page: Page) {
 
 test.beforeEach(async ({ page }) => mockApi(page));
 
+test('registration offers an optional phone number and sends it to the API', async ({ page }) => {
+  await page.unroute('http://localhost:5080/api/**');
+  await page.route('http://localhost:5080/api/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === '/api/configuration') return route.fulfill({ json: { id: 'platform', registrationEnabled: true, uploadsEnabled: true } });
+    expect(route.request().postDataJSON()).toEqual({ name: 'Jamie', email: 'jamie@example.com', password: 'password', phoneNumber: '+1 202 555 0147' });
+    return route.fulfill({ status: 202, json: { message: 'Check your email to complete account setup.' } });
+  });
+
+  await page.goto('/register', { waitUntil: 'domcontentloaded' });
+  await page.getByLabel('Name').fill('Jamie');
+  await page.getByLabel('Email address').fill('jamie@example.com');
+  await page.getByLabel('Phone number (optional)').fill('+1 202 555 0147');
+  await page.getByLabel('Password').fill('password');
+  await page.getByRole('button', { name: 'Create account' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Check your inbox' })).toBeVisible();
+});
+
 test('homepage loads API media and remains responsive', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: 'Latest approved' })).toBeVisible();
