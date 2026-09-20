@@ -10,7 +10,7 @@ public sealed class AuthController(IAuthService auth, AuthLinkBuilder links) : C
     [HttpPost("register")]
     public async Task<ActionResult<MessageResponse>> Register(RegisterRequest request)
     {
-        return Accepted(await auth.RegisterAsync(request, links.VerificationBaseUrl));
+        return Accepted(await auth.RegisterAsync(request, links.VerificationBaseUrl, RequestMetadataExtractor.Extract(HttpContext)));
     }
 
     [HttpGet("verify")]

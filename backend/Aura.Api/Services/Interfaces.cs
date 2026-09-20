@@ -15,7 +15,7 @@ public interface IMediaStorage
 }
 public interface IAuthService
 {
-    Task<MessageResponse> RegisterAsync(RegisterRequest request, string verificationBaseUrl);
+    Task<MessageResponse> RegisterAsync(RegisterRequest request, string verificationBaseUrl, ClientMetadata metadata);
     Task<MessageResponse> VerifyAsync(string token);
     Task<AuthResponse> LoginAsync(LoginRequest request);
     Task<MessageResponse> ForgotPasswordAsync(ForgotPasswordRequest request, string resetBaseUrl);
@@ -34,7 +34,7 @@ public interface IMediaService
 }
 public interface IUploadService
 {
-    Task<UploadResponse> BeginAsync(UploadRequest request, string userId, UploadMetadata metadata);
+    Task<UploadResponse> BeginAsync(UploadRequest request, string userId, ClientMetadata metadata);
     Task<MessageResponse> CompleteAsync(string id, CompleteUploadRequest request, string userId);
 }
 public interface ICommentService

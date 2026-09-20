@@ -33,7 +33,8 @@
             <dt>Uploader</dt><dd>@Model.OwnerName</dd>
             <dt>Uploaded</dt><dd>@Model.CreatedAt.ToLocalTime().ToString("f")</dd>
         </dl>
-        <partial name="_UploadMetadata" model="Model.UploadMetadata" />
+        @{ ViewData["MetadataTitle"] = "Upload metadata"; ViewData["MetadataEmptyMessage"] = "Metadata was not captured for this upload."; }
+        <partial name="_ClientMetadata" model="Model.UploadMetadata" />
         <form asp-action="Decide" method="post">
             <input type="hidden" name="id" value="@Model.Id">
             <label for="reason">Internal comment / rejection reason</label>

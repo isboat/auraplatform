@@ -15,12 +15,12 @@ public sealed class ManagedMedia
     public required string MediaType { get; set; }
     public string ContentType { get; set; } = "application/octet-stream";
     public required string ObjectKey { get; set; }
-    public UploadMetadata? UploadMetadata { get; set; }
+    public ClientMetadata? UploadMetadata { get; set; }
     public string ReviewStatus { get; set; } = ReviewStates.InReview;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
 
-public sealed class UploadMetadata
+public sealed class ClientMetadata
 {
     public string? IpAddress { get; set; }
     public string? Browser { get; set; }

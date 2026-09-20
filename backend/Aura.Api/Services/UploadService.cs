@@ -6,7 +6,7 @@ namespace Aura.Api.Services;
 
 public sealed class UploadService(IMediaRepository media, IUserRepository users, IConfigurationService configuration, IMediaStorage storage, IClock clock) : IUploadService
 {
-    public async Task<UploadResponse> BeginAsync(UploadRequest request, string userId, UploadMetadata metadata)
+    public async Task<UploadResponse> BeginAsync(UploadRequest request, string userId, ClientMetadata metadata)
     {
         if (!(await configuration.GetAsync()).UploadsEnabled) throw new ServiceException(403, "Uploads are currently unavailable.");
         if (request.Description.Length > 255) throw new ServiceException(400, "Description cannot exceed 255 characters.");

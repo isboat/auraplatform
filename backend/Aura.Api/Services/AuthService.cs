@@ -9,13 +9,20 @@ namespace Aura.Api.Services;
 public sealed class AuthService(IUserRepository users, IConfigurationService configuration, IPasswordHasher passwords, ITokenService tokens, IEmailService email, IClock clock) : IAuthService
 {
     private const string ResetRequestedMessage = "If an account exists for that verified email address, a password reset link has been sent.";
-    public async Task<MessageResponse> RegisterAsync(RegisterRequest request, string verificationBaseUrl)
+    public async Task<MessageResponse> RegisterAsync(RegisterRequest request, string verificationBaseUrl, ClientMetadata metadata)
     {
         if (!(await configuration.GetAsync()).RegistrationEnabled) throw new ServiceException(403, "Registration is currently unavailable.");
         var normalized = request.Email.Trim().ToLowerInvariant();
         if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Password) || !normalized.Contains('@')) throw new ServiceException(400, "Name, a valid email, and password are required.");
         if (await users.EmailExistsAsync(normalized)) throw new ServiceException(409, "An account with this email already exists.");
-        var user = new UserDocument { Name = request.Name.Trim(), Email = normalized, PasswordHash = passwords.Hash(request.Password) };
+        var user = new UserDocument
+        {
+            Name = request.Name.Trim(),
+            Email = normalized,
+            PasswordHash = passwords.Hash(request.Password),
+            CreatedAt = clock.UtcNow,
+            RegistrationMetadata = metadata
+        };
         await users.AddAsync(user);
         try
         {
