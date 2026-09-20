@@ -8,14 +8,14 @@ public static partial class RequestMetadataExtractor
 {
     private const int MaximumValueLength = 512;
 
-    public static UploadMetadata Extract(HttpContext context)
+    public static ClientMetadata Extract(HttpContext context)
     {
         var headers = context.Request.Headers;
         var userAgent = Value(headers.UserAgent);
         var platform = Value(headers["Sec-CH-UA-Platform"])?.Trim('"') ?? DetectPlatform(userAgent);
         var mobileHint = Value(headers["Sec-CH-UA-Mobile"]);
 
-        return new UploadMetadata
+        return new ClientMetadata
         {
             IpAddress = NormalizeAddress(context.Connection.RemoteIpAddress),
             Browser = Value(headers["Sec-CH-UA"]) ?? DetectBrowser(userAgent),

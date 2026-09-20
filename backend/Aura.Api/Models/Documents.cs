@@ -15,6 +15,7 @@ public sealed class UserDocument
     public string? PasswordResetTokenHash { get; set; }
     public DateTime? PasswordResetTokenExpiresAt { get; set; }
     public int SessionVersion { get; set; }
+    public ClientMetadata? RegistrationMetadata { get; set; }
 }
 
 public sealed class MediaDocument
@@ -28,7 +29,7 @@ public sealed class MediaDocument
     public required string MediaType { get; set; }
     public string ContentType { get; set; } = "application/octet-stream";
     public required string ObjectKey { get; set; }
-    public UploadMetadata? UploadMetadata { get; set; }
+    public ClientMetadata? UploadMetadata { get; set; }
     public string ReviewStatus { get; set; } = "InReview";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public long Views { get; set; }
@@ -38,7 +39,7 @@ public sealed class MediaDocument
     public HashSet<string> Dislikes { get; set; } = [];
 }
 
-public sealed class UploadMetadata
+public sealed class ClientMetadata
 {
     public string? IpAddress { get; set; }
     public string? Browser { get; set; }

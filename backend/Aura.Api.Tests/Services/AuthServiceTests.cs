@@ -22,9 +22,11 @@ public sealed class AuthServiceTests
     {
         _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration());
         _passwords.Setup(x => x.Hash("secret")).Returns("hashed");
+        var metadata = new ClientMetadata { IpAddress = "203.0.113.10", Browser = "Firefox 143.0", Device = "Desktop", Country = "GB" };
         UserDocument? added = null; _users.Setup(x => x.AddAsync(It.IsAny<UserDocument>())).Callback<UserDocument>(x => { x.Id = "id"; added = x; }).Returns(Task.CompletedTask);
-        var result = await Subject().RegisterAsync(new(" Name ", " USER@Example.COM ", "secret"), "https://aura/verify");
+        var result = await Subject().RegisterAsync(new(" Name ", " USER@Example.COM ", "secret"), "https://aura/verify", metadata);
         Assert.Equal("Check your email to complete account setup.", result.Message); Assert.Equal("user@example.com", added!.Email); Assert.Equal("Name", added.Name); Assert.Equal("hashed", added.PasswordHash);
+        Assert.Same(metadata, added.RegistrationMetadata);
         _email.Verify(x => x.SendVerificationAsync("user@example.com", It.Is<string>(url => url.StartsWith("https://aura/verify?token="))), Times.Once);
     }
 
@@ -39,20 +41,20 @@ public sealed class AuthServiceTests
             .ThrowsAsync(new InvalidOperationException("SMTP unavailable"));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            Subject().RegisterAsync(new("Name", "user@example.com", "secret"), "https://api.aura.example/api/auth/verify"));
+            Subject().RegisterAsync(new("Name", "user@example.com", "secret"), "https://api.aura.example/api/auth/verify", new ClientMetadata()));
 
         _users.Verify(x => x.DeleteAsync("new-user"), Times.Once);
     }
 
     [Fact]
     public async Task Register_rejects_disabled_registration()
-    { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration { RegistrationEnabled = false }); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().RegisterAsync(new("a", "a@b.com", "x"), "url")); Assert.Equal(403, e.StatusCode); }
+    { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration { RegistrationEnabled = false }); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().RegisterAsync(new("a", "a@b.com", "x"), "url", new ClientMetadata())); Assert.Equal(403, e.StatusCode); }
     [Theory, InlineData("", "a@b.com", "x"), InlineData("a", "invalid", "x"), InlineData("a", "a@b.com", "")]
     public async Task Register_validates_fields(string name, string email, string password)
-    { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration()); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().RegisterAsync(new(name, email, password), "url")); Assert.Equal(400, e.StatusCode); }
+    { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration()); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().RegisterAsync(new(name, email, password), "url", new ClientMetadata())); Assert.Equal(400, e.StatusCode); }
     [Fact]
     public async Task Register_rejects_duplicate_email()
-    { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration()); _users.Setup(x => x.EmailExistsAsync("a@b.com")).ReturnsAsync(true); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().RegisterAsync(new("a", "a@b.com", "x"), "url")); Assert.Equal(409, e.StatusCode); }
+    { _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration()); _users.Setup(x => x.EmailExistsAsync("a@b.com")).ReturnsAsync(true); var e = await Assert.ThrowsAsync<ServiceException>(() => Subject().RegisterAsync(new("a", "a@b.com", "x"), "url", new ClientMetadata())); Assert.Equal(409, e.StatusCode); }
     [Fact]
     public async Task Verify_returns_confirmation()
     { _users.Setup(x => x.VerifyAsync("token")).ReturnsAsync(true); Assert.Equal("Your account is verified.", (await Subject().VerifyAsync("token")).Message); }
