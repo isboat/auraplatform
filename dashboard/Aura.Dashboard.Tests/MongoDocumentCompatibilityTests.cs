@@ -18,6 +18,13 @@ public sealed class MongoDocumentCompatibilityTests
             ["Title"] = "Compatible media",
             ["MediaType"] = "video",
             ["ObjectKey"] = "media/video.mp4",
+            ["UploadMetadata"] = new BsonDocument
+            {
+                ["IpAddress"] = "203.0.113.9",
+                ["Browser"] = "Firefox 143.0",
+                ["Device"] = "Desktop",
+                ["Country"] = "GB"
+            },
             ["Views"] = 42,
             ["LikeCount"] = 8,
             ["DislikeCount"] = 1,
@@ -29,6 +36,10 @@ public sealed class MongoDocumentCompatibilityTests
 
         Assert.Equal("Compatible media", media.Title);
         Assert.Equal("media/video.mp4", media.ObjectKey);
+        Assert.Equal("203.0.113.9", media.UploadMetadata!.IpAddress);
+        Assert.Equal("Firefox 143.0", media.UploadMetadata.Browser);
+        Assert.Equal("Desktop", media.UploadMetadata.Device);
+        Assert.Equal("GB", media.UploadMetadata.Country);
     }
 
     [Fact]
