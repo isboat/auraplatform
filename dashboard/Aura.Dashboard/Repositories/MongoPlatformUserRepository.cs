@@ -28,4 +28,14 @@ public sealed class MongoPlatformUserRepository(MongoContext context) : IPlatfor
 
     public Task<PlatformUser?> FindAsync(string id) =>
         context.PlatformUsers.Find(user => user.Id == id).FirstOrDefaultAsync();
+
+    public async Task<bool> SetBlockedAsync(string id, bool blocked)
+    {
+        var result = await context.PlatformUsers.UpdateOneAsync(
+            user => user.Id == id,
+            Builders<PlatformUser>.Update
+                .Set(user => user.IsBlocked, blocked)
+                .Inc(user => user.SessionVersion, 1));
+        return result.MatchedCount == 1;
+    }
 }

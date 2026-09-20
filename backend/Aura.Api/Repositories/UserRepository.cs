@@ -50,6 +50,9 @@ public sealed class UserRepository(MongoContext db) : IUserRepository
                 versionFilter,
                 filters.Exists(user => user.SessionVersion, false));
 
-        return filters.And(filters.Eq(user => user.Id, userId), versionFilter);
+        return filters.And(
+            filters.Eq(user => user.Id, userId),
+            filters.Ne(user => user.IsBlocked, true),
+            versionFilter);
     }
 }
