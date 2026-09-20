@@ -15,6 +15,7 @@ public sealed class UserDocument
     public string? PasswordResetTokenHash { get; set; }
     public DateTime? PasswordResetTokenExpiresAt { get; set; }
     public int SessionVersion { get; set; }
+    public DateTime CreatedAt { get; set; }
     public ClientMetadata? RegistrationMetadata { get; set; }
 }
 

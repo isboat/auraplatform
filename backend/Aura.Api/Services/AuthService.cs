@@ -20,6 +20,7 @@ public sealed class AuthService(IUserRepository users, IConfigurationService con
             Name = request.Name.Trim(),
             Email = normalized,
             PasswordHash = passwords.Hash(request.Password),
+            CreatedAt = clock.UtcNow,
             RegistrationMetadata = metadata
         };
         await users.AddAsync(user);

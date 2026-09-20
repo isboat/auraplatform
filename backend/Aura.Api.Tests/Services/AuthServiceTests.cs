@@ -20,12 +20,15 @@ public sealed class AuthServiceTests
     [Fact]
     public async Task Register_creates_normalized_user_and_sends_verification()
     {
+        var registeredAt = new DateTime(2026, 9, 20, 14, 30, 0, DateTimeKind.Utc);
         _configuration.Setup(x => x.GetAsync()).ReturnsAsync(new PlatformConfiguration());
         _passwords.Setup(x => x.Hash("secret")).Returns("hashed");
+        _clock.SetupGet(x => x.UtcNow).Returns(registeredAt);
         var metadata = new ClientMetadata { IpAddress = "203.0.113.10", Browser = "Firefox 143.0", Device = "Desktop", Country = "GB" };
         UserDocument? added = null; _users.Setup(x => x.AddAsync(It.IsAny<UserDocument>())).Callback<UserDocument>(x => { x.Id = "id"; added = x; }).Returns(Task.CompletedTask);
         var result = await Subject().RegisterAsync(new(" Name ", " USER@Example.COM ", "secret"), "https://aura/verify", metadata);
         Assert.Equal("Check your email to complete account setup.", result.Message); Assert.Equal("user@example.com", added!.Email); Assert.Equal("Name", added.Name); Assert.Equal("hashed", added.PasswordHash);
+        Assert.Equal(registeredAt, added.CreatedAt);
         Assert.Same(metadata, added.RegistrationMetadata);
         _email.Verify(x => x.SendVerificationAsync("user@example.com", It.Is<string>(url => url.StartsWith("https://aura/verify?token="))), Times.Once);
     }
