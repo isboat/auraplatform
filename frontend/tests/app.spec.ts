@@ -195,3 +195,42 @@ test('password reset catches mismatched confirmation before calling the API', as
   await expect(page.getByRole('alert')).toHaveText('Passwords do not match.');
   expect(resetCalls).toBe(0);
 });
+
+test('every frontend route uses the dark color system', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.addInitScript(() => {
+    localStorage.setItem('aura-user', JSON.stringify({ id: 'admin', name: 'Jamie', email: 'jamie@example.com', isAdministrator: true }));
+    localStorage.setItem('aura-token', 'test-token');
+  });
+
+  const routes = [
+    '/', '/media/northern-lights', '/signin', '/register', '/forgot-password',
+    '/reset-password?token=one-time-token', '/upload', '/my-uploads', '/search?tag=nature',
+    '/admin', '/privacy', '/terms', '/does-not-exist'
+  ];
+
+  for (const route of routes) {
+    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('main')).toBeVisible();
+    const theme = await page.evaluate(() => {
+      const luminance = (color: string) => {
+        const channels = color.match(/\d+/g)?.slice(0, 3).map(Number) ?? [255, 255, 255];
+        return channels.reduce((sum, channel) => sum + channel, 0) / channels.length;
+      };
+      const selectors = ['html', 'body', 'header', 'footer', '.media-card', '.auth-form', '.center-card', '.admin-card', '.uploads-table', 'input', 'textarea'];
+      const visibleSurfaces = selectors.flatMap(selector => [...document.querySelectorAll<HTMLElement>(selector)])
+        .filter(element => element.getClientRects().length > 0)
+        .map(element => ({ selector: element.tagName + '.' + element.className, background: getComputedStyle(element).backgroundColor }))
+        .filter(surface => surface.background !== 'rgba(0, 0, 0, 0)');
+      return {
+        colorScheme: getComputedStyle(document.documentElement).colorScheme,
+        bodyBackground: getComputedStyle(document.body).backgroundColor,
+        lightSurfaces: visibleSurfaces.filter(surface => luminance(surface.background) > 180)
+      };
+    });
+
+    expect(theme.colorScheme, `${route} should advertise native dark controls`).toContain('dark');
+    expect(theme.bodyBackground, `${route} should use the dark page canvas`).toBe('rgb(8, 17, 14)');
+    expect(theme.lightSurfaces, `${route} contains a light-themed surface`).toEqual([]);
+  }
+});
