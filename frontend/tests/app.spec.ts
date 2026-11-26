@@ -230,7 +230,7 @@ test('every frontend route uses the dark color system', async ({ page }) => {
     });
 
     expect(theme.colorScheme, `${route} should advertise native dark controls`).toContain('dark');
-    expect(theme.bodyBackground, `${route} should use the dark page canvas`).toBe('rgb(8, 17, 14)');
+    expect(theme.bodyBackground, `${route} should use the dark page canvas`).toBe('rgb(16, 16, 18)');
     expect(theme.lightSurfaces, `${route} contains a light-themed surface`).toEqual([]);
   }
 });
