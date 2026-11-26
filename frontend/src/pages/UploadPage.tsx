@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { CheckCircle2, FileVideo, LoaderCircle, UploadCloud, X } from 'lucide-react';
 import { api } from '../api';
 
 export default function UploadPage() {
+  const fileInput = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [done, setDone] = useState(false);
   const [description, setDescription] = useState('');
@@ -58,12 +59,18 @@ export default function UploadPage() {
     </div>
     <form className="upload-form" onSubmit={submit} aria-busy={uploading}>
       <label className="dropzone">
-        <input type="file" accept="video/*,image/*,audio/*" onChange={event => setFile(event.target.files?.[0] ?? null)} required disabled={uploading} />
+        <input ref={fileInput} type="file" aria-label="Choose media file" accept="video/*,image/*,audio/*" onChange={event => setFile(event.target.files?.[0] ?? null)} required disabled={uploading} />
         {file
           ? <><FileVideo /><strong>{file.name}</strong><span>{(file.size / 1048576).toFixed(1)} MB</span></>
-          : <><UploadCloud /><strong>Drop your media here</strong><span>or click to browse · Large files upload in resilient parts</span></>}
+          : <><UploadCloud /><strong>Drop your media here</strong><span>or choose a video, image, or audio file</span></>}
       </label>
-      {file && !uploading && <button type="button" className="remove-file" onClick={() => setFile(null)}><X />Remove</button>}
+      {file && !uploading && <button type="button" className="remove-file" onClick={() => {
+        setFile(null);
+        if (fileInput.current) {
+          fileInput.current.value = '';
+          fileInput.current.focus();
+        }
+      }}><X />Remove</button>}
       <div className="form-grid">
         <label>Title <span>Optional</span><input name="title" placeholder="Untitled masterpiece" disabled={uploading} /></label>
         <label className="full">Description <span>{description.length}/255</span><textarea name="description" maxLength={255} value={description} onChange={event => setDescription(event.target.value)} placeholder="Tell people about this media…" disabled={uploading} /></label>
